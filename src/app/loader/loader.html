@@ -1,0 +1,64 @@
+@if (visibleSignal()) {
+  <div
+    class="loader-backdrop"
+    [class.bd-light]="backdrop === 'light'"
+    [class.bd-dark]="backdrop === 'dark'"
+    [class.bd-blur]="backdrop === 'blur'"
+    [class.bd-transparent]="backdrop === 'transparent'"
+    [class.loader-inline]="!fullscreen">
+
+    <div class="loader-card">
+
+      <!-- Dots -->
+      @if (type === 'dots') {
+        <div class="loader-dots">
+          <span [style.background]="color"></span>
+          <span [style.background]="color"></span>
+          <span [style.background]="color"></span>
+        </div>
+      }
+
+      <!-- Spinner -->
+      @if (type === 'spinner') {
+        <div class="loader-spinner" [style.border-top-color]="color"></div>
+      }
+
+      <!-- Bar -->
+      @if (type === 'bar') {
+        <div class="loader-bar">
+          <div class="loader-bar-fill" [style.background]="color"></div>
+        </div>
+      }
+
+      <!-- Pulse -->
+      @if (type === 'pulse') {
+        <div class="loader-pulse" [style.background]="color"></div>
+      }
+
+      <!-- Wave -->
+      @if (type === 'wave') {
+        <div class="loader-wave">
+          <span [style.background]="color"></span>
+          <span [style.background]="color"></span>
+          <span [style.background]="color"></span>
+          <span [style.background]="color"></span>
+          <span [style.background]="color"></span>
+        </div>
+      }
+
+      <!-- Ring -->
+      @if (type === 'ring') {
+        <div class="loader-ring" [style.border-color]="color + '33'" [style.border-top-color]="color"></div>
+      }
+
+      @if (showTitle) {
+        <div class="loader-title">{{ title }}</div>
+      }
+
+      @if (showMessage) {
+        <div class="loader-message">{{ message }}</div>
+      }
+
+    </div>
+  </div>
+}

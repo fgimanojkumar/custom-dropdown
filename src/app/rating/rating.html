@@ -1,0 +1,62 @@
+﻿<div class="rating-wrap"
+  [class.rating-disabled]="disabled"
+  [class.rating-readonly]="readonly"
+  [class.sz-sm]="size === 'sm'"
+  [class.sz-md]="size === 'md'"
+  [class.sz-lg]="size === 'lg'">
+
+  @if (label) {
+    <div class="rating-label">{{ label }}</div>
+  }
+
+  <div class="rating-row">
+    <div class="stars-row" (mouseleave)="clearHover()">
+      @for (star of stars; track star) {
+        <div class="star-wrap" [title]="tooltip">
+
+          @if (!readonly && !disabled) {
+            @if (allowHalf) {
+              <span class="hit-area left-hit"
+                (mouseenter)="hover(star, true)"
+                (click)="pick(star, true)"></span>
+              <span class="hit-area right-hit"
+                (mouseenter)="hover(star, false)"
+                (click)="pick(star, false)"></span>
+            } @else {
+              <span class="hit-area full-hit"
+                (mouseenter)="hover(star)"
+                (click)="pick(star)"></span>
+            }
+          }
+
+          <!-- Empty star -->
+          <svg class="star-svg star-empty" viewBox="0 0 24 24">
+            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+              [attr.stroke]="emptyColor" fill="none" stroke-width="1.5"/>
+          </svg>
+
+          <!-- Filled star (clipped) -->
+          <svg class="star-svg star-filled"
+            viewBox="0 0 24 24"
+            [style.clip-path]="'inset(0 ' + (100 - getFill(star)) + '% 0 0)'">
+            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+              [attr.fill]="color" [attr.stroke]="color" stroke-width="1.5"/>
+          </svg>
+
+        </div>
+      }
+    </div>
+
+    @if (showValue) {
+      <span class="rating-val">
+        <strong>{{ value > 0 ? value : '—' }}</strong>
+        <span class="rating-max">/ {{ max }}</span>
+      </span>
+    }
+  </div>
+
+  @if (tooltip) {
+    <div class="rating-tooltip-label">{{ tooltip }}</div>
+  }
+
+</div>

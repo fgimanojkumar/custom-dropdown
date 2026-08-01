@@ -1,0 +1,430 @@
+// ── Variables ────────────────────────────────────────────────────────────────
+$primary: #6366f1;
+$primary-light: #eef2ff;
+$primary-mid: #c7d2fe;
+$text-dark: #1e293b;
+$text-mid: #475569;
+$text-light: #94a3b8;
+$border: #e2e8f0;
+$bg-white: #ffffff;
+$bg-subtle: #f8fafc;
+$radius-md: 10px;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
+$shadow-lg: 0 12px 32px rgba(0, 0, 0, .12), 0 4px 12px rgba(0, 0, 0, .08);
+$transition: all .2s cubic-bezier(.4, 0, .2, 1);
+
+// ── Container ─────────────────────────────────────────────────────────────────
+.cal-container {
+    width: 100%;
+    position: relative;
+    margin: 10px 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-sizing: border-box;
+
+    &.cal-disabled {
+        opacity: .5;
+        pointer-events: none;
+    }
+
+    &.cal-readonly .cal-trigger {
+        cursor: default;
+    }
+}
+
+// ── Trigger ───────────────────────────────────────────────────────────────────
+.cal-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 6px 10px 6px 12px;
+    background: $bg-white;
+    border: 1.5px solid $border;
+    border-radius: $radius-md;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+    transition: $transition;
+    box-sizing: border-box;
+    user-select: none;
+
+    &:hover {
+        border-color: $primary-mid;
+        box-shadow: 0 0 0 3px rgba($primary, .08), $shadow-sm;
+    }
+
+    &.open {
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, .12), $shadow-sm;
+    }
+
+    .cal-icon {
+        color: $text-light;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+    }
+
+    .cal-trigger-value {
+        flex: 1;
+        font-size: .900rem;
+        font-weight: 400;
+        color: $text-dark;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.cal-placeholder {
+            color: $text-light;
+            font-weight: 400;
+        }
+    }
+
+    .cal-clear {
+        background: $border;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .8rem;
+        font-weight: 700;
+        color: $text-mid;
+        cursor: pointer;
+        flex-shrink: 0;
+        line-height: 1;
+        padding: 0;
+        transition: $transition;
+
+        &:hover {
+            background: #cbd5e1;
+            color: $text-dark;
+        }
+    }
+
+    .cal-arrow {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .85rem;
+        color: $text-light;
+        background: $bg-subtle;
+        transition: $transition;
+
+        &.open {
+            transform: rotate(180deg);
+            color: $primary;
+            background: $primary-light;
+        }
+    }
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+.cal-panel {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 300px;
+    background: $bg-white;
+    border: 1.5px solid $border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-lg;
+    z-index: 9999;
+    overflow: hidden;
+    animation: calSlideIn .18s ease-out;
+
+    &.panel-inline {
+        position: static;
+        box-shadow: $shadow-sm;
+        border-color: $border;
+        animation: none;
+    }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+.cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 10px;
+    background: $bg-subtle;
+    border-bottom: 1.5px solid $border;
+    gap: 4px;
+}
+
+.cal-nav {
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid $border;
+    border-radius: 8px;
+    background: $bg-white;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: $text-mid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: $transition;
+
+    &:hover {
+        border-color: $primary-mid;
+        color: $primary;
+        background: $primary-light;
+    }
+}
+
+.cal-header-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.cal-month-btn,
+.cal-year-btn {
+    border: none;
+    background: transparent;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: $text-dark;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+        background: $primary-light;
+        color: $primary;
+    }
+}
+
+.cal-year-range {
+    font-size: .9rem;
+    font-weight: 600;
+    color: $text-dark;
+    padding: 4px 8px;
+}
+
+// ── Weekdays ──────────────────────────────────────────────────────────────────
+.cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: $bg-subtle;
+    border-bottom: 1px solid $border;
+    padding: 4px 6px;
+    gap: 2px;
+}
+
+.cal-weekday {
+    text-align: center;
+    font-size: 0.70rem;
+    font-weight: 500;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 0;
+}
+
+// ── Days Grid ─────────────────────────────────────────────────────────────────
+.cal-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 8px 6px;
+    gap: 2px;
+}
+
+.cal-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: $transition;
+    min-width: 0;
+
+    .cal-day-num {
+        font-size: .825rem;
+        font-weight: 500;
+        line-height: 1;
+        z-index: 1;
+        position: relative;
+        color: $text-dark;
+    }
+
+    &:hover:not(.cal-day-disabled):not(.cal-selected) {
+        background: $primary-light;
+
+        .cal-day-num {
+            color: $primary;
+        }
+    }
+
+    &.cal-other-month .cal-day-num {
+        color: $text-light;
+    }
+
+    &.cal-today:not(.cal-selected) {
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--cc, $primary);
+        }
+
+        .cal-day-num {
+            color: var(--cc, $primary);
+            font-weight: 700;
+        }
+    }
+
+    &.cal-selected,
+    &.cal-range-start,
+    &.cal-range-end {
+        background: var(--cc, $primary) !important;
+        border-radius: 50%;
+
+        .cal-day-num {
+            color: white !important;
+            font-weight: 700;
+        }
+
+        &::after {
+            display: none;
+        }
+    }
+
+    &.cal-in-range {
+        background: color-mix(in srgb, var(--cc, $primary) 12%, transparent);
+        border-radius: 0;
+
+        .cal-day-num {
+            color: $text-dark;
+        }
+    }
+
+    // Range start/end edges
+    &.cal-range-start {
+        border-radius: 50% 0 0 50% !important;
+    }
+
+    &.cal-range-end {
+        border-radius: 0 50% 50% 0 !important;
+    }
+
+    &.cal-range-start.cal-range-end {
+        border-radius: 50% !important;
+    }
+
+    &.cal-day-disabled {
+        pointer-events: none;
+        opacity: .35;
+    }
+}
+
+// ── Months & Years Grid ───────────────────────────────────────────────────────
+.cal-months-grid,
+.cal-years-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 12px;
+}
+
+.cal-month-cell,
+.cal-year-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 6px;
+    border-radius: 8px;
+    font-size: .825rem;
+    font-weight: 500;
+    color: $text-dark;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+        background: $primary-light;
+        color: $primary;
+    }
+
+    &.cal-cell-active {
+        background: var(--cc, $primary);
+        color: white;
+        font-weight: 700;
+    }
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+.cal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-top: 1.5px solid $border;
+    background: $bg-subtle;
+    gap: 8px;
+}
+
+.cal-today-btn {
+    background: transparent;
+    border: 1.5px solid;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: .8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: $transition;
+
+    &:hover {
+        filter: brightness(.9);
+    }
+}
+
+.cal-clear-link {
+    background: transparent;
+    border: none;
+    font-size: .8rem;
+    color: #ef4444;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: $transition;
+
+    &:hover {
+        background: #fff5f5;
+    }
+}
+
+// ── Animation ─────────────────────────────────────────────────────────────────
+@keyframes calSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scaleY(.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scaleY(1);
+    }
+}
+
+// ── Inline ────────────────────────────────────────────────────────────────────
+.cal-inline .cal-panel {
+    width: 100%;
+}

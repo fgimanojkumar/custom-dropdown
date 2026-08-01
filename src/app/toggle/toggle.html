@@ -1,0 +1,62 @@
+<div
+  class="toggle-wrapper"
+  [class.disabled]="disabled"
+  [class.readonly]="readonly"
+  [class.loading]="loading"
+  [class.label-left]="labelPosition === 'left'">
+
+  <!-- Label LEFT -->
+  @if (label && labelPosition === 'left') {
+    <div class="toggle-label-block">
+      <span class="toggle-label">{{ label }}</span>
+      @if (description) {
+        <span class="toggle-description">{{ description }}</span>
+      }
+    </div>
+  }
+
+  <button
+    type="button"
+    class="toggle"
+    role="switch"
+    [attr.aria-checked]="checked"
+    [attr.aria-disabled]="disabled"
+    [class.checked]="checked"
+    [class.sm]="size === 'sm'"
+    [class.md]="size === 'md'"
+    [class.lg]="size === 'lg'"
+    [style.--on-color]="color"
+    [style.--off-color]="offColor"
+    (click)="toggle()"
+    (keydown)="onKeyDown($event)">
+
+    <span class="track">
+      <!-- On/Off text labels inside track -->
+      @if (onLabel || offLabel) {
+        <span class="track-label track-on-label">{{ onLabel }}</span>
+        <span class="track-label track-off-label">{{ offLabel }}</span>
+      }
+      <span class="thumb">
+        @if (loading) {
+          <span class="thumb-spinner"></span>
+        }
+      </span>
+    </span>
+
+  </button>
+
+  <!-- Label RIGHT (default) -->
+  @if (label && labelPosition === 'right') {
+    <div class="toggle-label-block">
+      <span class="toggle-label">{{ label }}</span>
+      @if (description) {
+        <span class="toggle-description">{{ description }}</span>
+      }
+    </div>
+  }
+
+  @if (loading && !label) {
+    <span class="loading-spinner"></span>
+  }
+
+</div>

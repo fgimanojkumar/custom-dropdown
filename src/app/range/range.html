@@ -1,0 +1,49 @@
+<div class="range-container" [class.readonly]="readonly" [class.disabled]="disabled" [class]="'size-' + size">
+
+  @if(showLabel && label){
+    <div class="range-label">
+      <span>{{ label }}</span>
+      @if(showValue){
+        <span class="range-value" [style.color]="color">
+          {{ displayValue }}
+        </span>
+      }
+    </div>
+  }
+
+  <div
+    class="slider-wrapper"
+    [class.tooltip-top]="tooltipPosition === 'top'"
+    [class.tooltip-bottom]="tooltipPosition === 'bottom'"
+    (mouseenter)="showTooltipFn()"
+    (mouseleave)="hideTooltipFn()">
+
+    @if(showTooltip && tooltipVisibleSignal()){
+      <div
+        class="value-box"
+        [style.left.%]="((value - min) / (max - min)) * 100"
+        [style.background]="'linear-gradient(135deg, ' + color + ', ' + color + ')'">
+        {{ displayValue }}
+      </div>
+    }
+
+    <input
+      type="range"
+      class="slider"
+      [min]="min"
+      [max]="max"
+      [step]="step"
+      [value]="value"
+      [disabled]="disabled || readonly"
+      [style.--value]="((value - min) / (max - min)) * 100 + '%'"
+      [style.--color]="color"
+      [style.--thumb-color]="thumbColor || color"
+      [style.height]="height ? height + 'px' : null"
+      (mousedown)="showTooltipFn()"
+      (mouseup)="hideTooltipFn()"
+      (touchstart)="showTooltipFn()"
+      (touchend)="hideTooltipFn()"
+      (input)="valueChanged($event)">
+  </div>
+
+</div>

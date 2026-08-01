@@ -1,0 +1,221 @@
+﻿// ── Variables ───────────────────────────────────────────────────────────────
+$primary:        #22c55e;
+$primary-light:  #dcfce7;
+$text-dark:      #1e293b;
+$text-mid:       #475569;
+$text-light:     #94a3b8;
+$bg-subtle:      #f8fafc;
+$border:         #e2e8f0;
+$shadow-sm:      0 1px 3px rgba(0,0,0,.08);
+$shadow-md:      0 4px 12px rgba(0,0,0,.12);
+$transition:     all .2s cubic-bezier(.4,0,.2,1);
+
+// ── Container ───────────────────────────────────────────────────────────────
+.range-container {
+  width: 100%;
+  padding: 16px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  &.readonly {
+    opacity: 0.65;
+    pointer-events: none;
+
+    .slider { cursor: default; }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+
+    .slider { cursor: not-allowed; }
+  }
+
+  // Sizes
+  &.size-sm .slider { height: 4px; }
+  &.size-md .slider { height: 6px; }
+  &.size-lg .slider { height: 10px; }
+}
+
+// ── Label ───────────────────────────────────────────────────────────────────
+.range-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 12px;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $text-dark;
+}
+
+// ── Value Display ────────────────────────────────────────────────────────────
+.range-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, $primary-light, #f0fdf4);
+  border: 1.5px solid $primary;
+  border-radius: 8px;
+  display: inline-block;
+  color: #166534;
+  box-shadow: 0 0 0 3px rgba($primary, .08);
+  letter-spacing: 0.5px;
+}
+
+// ── Slider Wrapper ───────────────────────────────────────────────────────────
+.slider-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 28px;
+
+  &.tooltip-bottom {
+    padding-top: 8px;
+    padding-bottom: 32px;
+  }
+}
+
+// ── Slider Track & Thumb ─────────────────────────────────────────────────────
+.slider {
+  width: 100%;
+  height: 6px;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: height .15s $transition;
+  background: transparent;
+  outline: none;
+
+  &:hover {
+    height: 8px;
+
+    &::-webkit-slider-thumb { transform: scale(1.25); }
+    &::-moz-range-thumb { transform: scale(1.25); }
+  }
+
+  &:focus {
+    &::-webkit-slider-thumb { box-shadow: 0 0 0 6px rgba(34, 197, 94, .15); }
+    &::-moz-range-thumb { box-shadow: 0 0 0 6px rgba(34, 197, 94, .15); }
+  }
+}
+
+// ── Track (Firefox) ──────────────────────────────────────────────────────────
+.slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+.slider::-moz-range-progress {
+  background: $primary;
+  border-radius: 999px;
+  height: 100%;
+}
+
+// ── Thumb (Chrome/Safari) ────────────────────────────────────────────────────
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 2.5px solid var(--thumb-color, #4f46e5);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2), $shadow-md;
+  transition: $transition;
+  transform-origin: center;
+
+  &:active {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 8px rgba(0,0,0,.08), $shadow-md;
+  }
+}
+
+// ── Thumb (Firefox) ──────────────────────────────────────────────────────────
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 2.5px solid var(--thumb-color, #4f46e5);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2), $shadow-md;
+  transition: $transition;
+
+  &:active {
+    transform: scale(1.15);
+  }
+}
+
+// ── Tooltip ──────────────────────────────────────────────────────────────────
+.value-box {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  transform: translateX(-50%);
+  min-width: 56px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, $primary, #16a34a);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba($primary, .35);
+  pointer-events: none;
+  z-index: 10;
+  animation: tooltipPop .3s cubic-bezier(.34,1.56,.64,1);
+  letter-spacing: 0.3px;
+
+  // Tooltip arrow (top)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid $primary;
+  }
+
+  // Bottom tooltip
+  .tooltip-bottom & {
+    top: auto;
+    bottom: -8px;
+
+    &::before {
+      top: auto;
+      bottom: 100%;
+      border-top: none;
+      border-bottom: 6px solid $primary;
+    }
+  }
+}
+
+// ── Animations ───────────────────────────────────────────────────────────────
+@keyframes tooltipPop {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(.6) translateY(-4px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.08) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) translateY(0);
+  }
+}
+
+// ── Track Background (using CSS custom properties) ────────────────────────
+.slider {
+  background: linear-gradient(to right, var(--color) var(--value), #e5e7eb var(--value));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}

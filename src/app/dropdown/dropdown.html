@@ -1,0 +1,231 @@
+﻿<div
+  class="dropdown-container"
+  role="combobox"
+  [attr.aria-label]="placeholder"
+  [attr.aria-expanded]="showDropdown"
+  [attr.aria-disabled]="disabled || null"
+  [attr.aria-readonly]="readonly || null"
+  tabindex="0">
+
+  <!-- ── Trigger Button ── -->
+  <div
+    class="dropdown-button"
+    [ngClass]="disabledClass"
+    (click)="changeDropdown()"
+    role="button"
+    [attr.aria-haspopup]="'listbox'">
+
+    <div class="button-text">
+      <div class="value-text">
+        @if (!multipleSelect) {
+          @if (selectedLabel) {
+            <span>{{ selectedLabel }}</span>
+          } @else {
+            <span class="placeholder">{{ placeholder }}</span>
+          }
+        }
+
+        @if (multipleSelect) {
+          @if (selectedValueArr.length > 0) {
+            <span class="tags-row">
+              @for (val of selectedValueArr; track val) {
+                <span class="selected-tag">
+                  <span class="tag-text">{{ val }}</span>
+                  @if (!readonly) {
+                    <button
+                      class="remove-btn"
+                      (click)="removeSelectedValue($event, val)"
+                      type="button"
+                      [attr.aria-label]="'Remove ' + val">×</button>
+                  }
+                </span>
+              }
+            </span>
+          } @else {
+            <span class="placeholder">{{ placeholder }}</span>
+          }
+        }
+      </div>
+    </div>
+
+    <span class="dropdown-arrow" [class.open]="showDropdown">&#9662;</span>
+  </div>
+
+  <!-- ── Loading Spinner (Feature #7) ── -->
+  @if (loading) {
+    <div class="loading-container">
+      <span class="spinner"></span>
+      <span class="loading-text">Loading…</span>
+    </div>
+  }
+
+  @if (!loading) {
+    <!-- ── Search Area ── -->
+    @if (canSearch && showDropdown && dataArray.length > 0) {
+      <div class="search-area">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            #searchInput
+            [(ngModel)]="searchText"
+            placeholder="Search..."
+            autofocus="true"
+            class="search"
+            aria-label="Search options"
+            role="searchbox">
+
+          @if (searchText) {
+            <button class="clear" (click)="clearSearch($event)" aria-label="Clear search">×</button>
+          }
+        </div>
+
+        @if (multipleSelect) {
+          <div class="all-select">
+            <!-- Feature #8: indeterminate state -->
+            <input
+              type="checkbox"
+              (change)="selectAll($event)"
+              class="all-select-checkbox"
+              [checked]="allSelectChecked"
+              [indeterminate]="indeterminate"
+              id="select-all"
+              [ngStyle]="{'accent-color': checkboxColor}"
+              aria-label="Select all">
+            <label for="select-all">Select All</label>
+
+            @if (selectedCount > 0) {
+              <span class="select-count clickable" (click)="clearAllValue($event)">Clear</span>
+              <span class="select-count">{{ selectedCount }}</span>
+            }
+
+            <!-- Feature #6: selection limit badge -->
+            @if (maxSelect > 0) {
+              <span class="limit-badge" [class.limit-reached]="limitReached">
+                {{ selectedCount }}/{{ maxSelect }}
+              </span>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (canSearch && showDropdown && filteredData.length === 0 && dataArray.length > 0) {
+      <div class="dataNotFound">No results found.</div>
+    }
+
+    @if (showDropdown && dataArray.length === 0) {
+      <div class="dataNotFound">No data available.</div>
+    }
+
+    <!-- Limit reached error message -->
+    @if (limitReached && multipleSelect && showDropdown) {
+      <div class="limit-error-bar">
+        &#9888; Maximum {{ maxSelect }} item{{ maxSelect === 1 ? '' : 's' }} can be selected
+      </div>
+    }
+
+    <!-- ── Dropdown List ── -->
+    @if (showDropdown) {
+      <div class="dropdown-content" role="listbox" [attr.aria-multiselectable]="multipleSelect">
+        <div class="select-options">
+
+          <!-- Feature #3: Grouped Options -->
+          @if (groupedData && showGrouping) {
+            @for (grp of groupedData; track grp.group) {
+              <div class="group-header" [ngStyle]="{'background': groupingColor}">
+                <span>{{ grp.group }}</span>
+              </div>
+              @for (item of grp.options; track getValue(item); let i = $index) {
+                <div
+                  class="option"
+                  [class.checked]="isChecked(item)"
+                  [class.disabled-option]="isItemDisabled(item)"
+                  [class.focused]="focusedIndex === i"
+                  [ngStyle]="{'background-color': isChecked(item) && !isItemDisabled(item) ? 'rgb(235,235,235)' : ''}"
+                  (click)="toggleItem(item)"
+                  role="option"
+                  [attr.aria-selected]="isChecked(item)"
+                  [attr.aria-disabled]="isItemDisabled(item) || null">
+
+                  @if (multipleSelect) {
+                    <input
+                      type="checkbox"
+                      [value]="getValue(item)"
+                      [id]="'grp-opt-' + i"
+                      [checked]="isChecked(item)"
+                      [disabled]="isItemDisabled(item)"
+                      [ngStyle]="{'accent-color': checkboxColor}"
+                      (click)="onCheckboxClick($event, item)"
+                      (change)="toggleItem(item)" />
+                  }
+                  <!-- Icon -->
+                  @if (showIcons && getIcon(item)) {
+                    <span class="option-icon">{{ getIcon(item) }}</span>
+                  }
+                  <label [for]="'grp-opt-' + i" [class.disabled-label]="isItemDisabled(item)" (click)="onLabelClick($event, item)">
+                    {{ getLabel(item) }}
+                  </label>
+                  <!-- Badge -->
+                  @if (showBadges && getBadge(item)) {
+                    <span class="option-badge" [ngStyle]="{'background': getBadgeColor(item)}">
+                      {{ getBadge(item) }}
+                    </span>
+                  }
+                  <!-- Feature #4: Disabled lock icon -->
+                  @if (isItemDisabled(item)) {
+                    <span class="disabled-lock">&#128274;</span>
+                  }
+                </div>
+              }
+            }
+
+          } @else {
+            <!-- Flat Options -->
+            @for (item of filteredData; track getValue(item); let i = $index) {
+              <div
+                class="option"
+                [class.checked]="isChecked(item)"
+                [class.disabled-option]="isItemDisabled(item)"
+                [class.focused]="focusedIndex === i"
+                [ngStyle]="{'background-color': isChecked(item) && !isItemDisabled(item) ? 'rgb(235,235,235)' : ''}"
+                (click)="toggleItem(item)"
+                role="option"
+                [attr.aria-selected]="isChecked(item)"
+                [attr.aria-disabled]="isItemDisabled(item) || null">
+
+                @if (multipleSelect) {
+                  <input
+                    type="checkbox"
+                    [value]="getValue(item)"
+                    [id]="'opt-' + i"
+                    [checked]="isChecked(item)"
+                    [disabled]="isItemDisabled(item)"
+                    [ngStyle]="{'accent-color': checkboxColor}"
+                    (click)="onCheckboxClick($event, item)"
+                    (change)="toggleItem(item)" />
+                }
+                @if (showIcons && getIcon(item)) {
+                  <span class="option-icon">{{ getIcon(item) }}</span>
+                }
+                <label [for]="'opt-' + i" [class.disabled-label]="isItemDisabled(item)" (click)="onLabelClick($event, item)">
+                  {{ getLabel(item) }}
+                </label>
+                @if (showBadges && getBadge(item)) {
+                  <span class="option-badge" [ngStyle]="{'background': getBadgeColor(item)}">
+                    {{ getBadge(item) }}
+                  </span>
+                }
+                @if (isItemDisabled(item)) {
+                  <span class="disabled-lock">&#128274;</span>
+                }
+              </div>
+            }
+          }
+
+
+
+        </div>
+      </div>
+    }
+  }
+</div>

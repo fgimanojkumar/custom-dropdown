@@ -1,0 +1,124 @@
+<div class="cal-container" [class.cal-disabled]="disabled" [class.cal-readonly]="readonly" [class.cal-inline]="inline">
+
+  <!-- ── Trigger Input ── -->
+  @if (!inline) {
+    <div class="cal-trigger" [class.open]="showCalendar" (click)="toggleCalendar()">
+      <span class="cal-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </span>
+      <span class="cal-trigger-value" [class.cal-placeholder]="!displayValue">
+        {{ displayValue || placeholder }}
+      </span>
+      @if (displayValue && !readonly) {
+        <button class="cal-clear" (click)="clear($event)" aria-label="Clear">×</button>
+      }
+      <span class="cal-arrow" [class.open]="showCalendar">&#9662;</span>
+    </div>
+  }
+
+  <!-- ── Calendar Panel ── -->
+  @if (showCalendar) {
+    <div class="cal-panel" [class.panel-inline]="inline">
+
+      <!-- Header -->
+      <div class="cal-header">
+        <button class="cal-nav" (click)="navigate(-1)" aria-label="Previous">&#8249;</button>
+
+        <div class="cal-header-label">
+          @if (viewMode === 'days') {
+            <button class="cal-month-btn" (click)="setViewMode('months')">
+              {{ MONTH_NAMES[viewMonth] }}
+            </button>
+            <button class="cal-year-btn" (click)="setViewMode('years')">
+              {{ viewYear }}
+            </button>
+          }
+          @if (viewMode === 'months') {
+            <button class="cal-year-btn" (click)="setViewMode('years')">{{ viewYear }}</button>
+          }
+          @if (viewMode === 'years') {
+            <span class="cal-year-range">{{ headerLabel }}</span>
+          }
+        </div>
+
+        <button class="cal-nav" (click)="navigate(1)" aria-label="Next">&#8250;</button>
+      </div>
+
+      <!-- Days View -->
+      @if (viewMode === 'days') {
+        <div class="cal-weekdays">
+          @for (d of weekDays; track d) {
+            <div class="cal-weekday">{{ d }}</div>
+          }
+        </div>
+
+        <div class="cal-days-grid">
+          @for (date of calDays; track date.getTime()) {
+            <div
+              class="cal-day"
+              [class.cal-today]="isToday(date)"
+              [class.cal-selected]="isSelected(date)"
+              [class.cal-range-start]="isRangeStart(date)"
+              [class.cal-range-end]="isRangeEnd(date)"
+              [class.cal-in-range]="isInRange(date)"
+              [class.cal-other-month]="!isCurMonth(date)"
+              [class.cal-day-disabled]="isDisabled(date)"
+              [style.--cc]="color"
+              (click)="selectDate(date)"
+              (mouseenter)="hover(date)"
+              (mouseleave)="hover(null)">
+              <span class="cal-day-num">{{ date.getDate() }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Footer -->
+        <div class="cal-footer">
+          @if (showToday) {
+            <button class="cal-today-btn" [style.color]="color" [style.border-color]="color" (click)="goToday()">
+              Today
+            </button>
+          }
+          @if (displayValue) {
+            <button class="cal-clear-link" (click)="clear($event)">Clear</button>
+          }
+        </div>
+      }
+
+      <!-- Months View -->
+      @if (viewMode === 'months') {
+        <div class="cal-months-grid">
+          @for (m of MONTH_SHORT; track m; let i = $index) {
+            <div
+              class="cal-month-cell"
+              [class.cal-cell-active]="i === viewMonth"
+              [style.--cc]="color"
+              (click)="pickMonth(i)">
+              {{ m }}
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Years View -->
+      @if (viewMode === 'years') {
+        <div class="cal-years-grid">
+          @for (y of yearRange; track y) {
+            <div
+              class="cal-year-cell"
+              [class.cal-cell-active]="y === viewYear"
+              [style.--cc]="color"
+              (click)="pickYear(y)">
+              {{ y }}
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

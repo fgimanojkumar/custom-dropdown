@@ -1,0 +1,49 @@
+﻿<div class="pgn-wrap">
+  <div class="pgn-controls">
+
+    @if (showInfo) {
+      <span class="pgn-info">
+        @if (totalItems > 0) {
+          <strong>{{ startRow }}–{{ endRow }}</strong> of <strong>{{ totalItems }}</strong>
+        } @else {
+          No data
+        }
+      </span>
+    }
+
+    <div class="pgn-pages">
+      <button class="pgn-btn pgn-nav" title="First"
+        (click)="goPage(1)" [disabled]="currentPage === 1">&#171;</button>
+      <button class="pgn-btn pgn-nav" title="Previous"
+        (click)="goPage(currentPage - 1)" [disabled]="currentPage === 1">&#8249;</button>
+
+      @for (p of pageNumbers; track $index) {
+        @if (p === '...') {
+          <span class="pgn-dots">…</span>
+        } @else {
+          <button class="pgn-btn"
+            [class.pgn-active]="p === currentPage"
+            [style.background]="p === currentPage ? color : ''"
+            [style.border-color]="p === currentPage ? color : ''"
+            (click)="goPage(p)">{{ p }}</button>
+        }
+      }
+
+      <button class="pgn-btn pgn-nav" title="Next"
+        (click)="goPage(currentPage + 1)" [disabled]="currentPage === totalPages">&#8250;</button>
+      <button class="pgn-btn pgn-nav" title="Last"
+        (click)="goPage(totalPages)" [disabled]="currentPage === totalPages">&#187;</button>
+    </div>
+
+    @if (showPageSize) {
+      <select class="pgn-size"
+        [value]="pageSizeVal"
+        (change)="changePageSize($any($event.target).value)">
+        @for (s of pageSizeOptions; track s) {
+          <option [value]="s">{{ s }} / page</option>
+        }
+      </select>
+    }
+
+  </div>
+</div>

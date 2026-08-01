@@ -1,0 +1,79 @@
+﻿<div class="grid-wrap">
+
+  <!-- Table -->
+  <div class="grid-scroll">
+    <table class="g-table" [class.g-striped]="striped">
+
+      <!-- Auto thead from [cols] -->
+      <thead>
+        <tr>
+          @for (col of cols; track col.key) {
+            <th [class]="thClass(col)"
+              [style.width]="col.width || null"
+              [style.text-align]="col.align || 'left'"
+              (click)="col.sort && sort(col.key)">
+              {{ col.label }}{{ col.sort ? sortIcon(col.key) : "" }}
+            </th>
+          }
+        </tr>
+      </thead>
+
+      <!-- User ka tbody: @for (row of g.pagedData; ...) -->
+      <ng-content select="tbody"></ng-content>
+
+      <!-- Optional: ng-template #row approach bhi kaam karta hai -->
+      @if (rowTpl) {
+        <tbody>
+          @for (row of pagedData; track $index) {
+            <tr>
+              <ng-container [ngTemplateOutlet]="rowTpl"
+                [ngTemplateOutletContext]="rowCtx(row, $index)">
+              </ng-container>
+            </tr>
+          }
+        </tbody>
+      }
+
+    </table>
+  </div>
+
+  <!-- Auto pagination -->
+  <div class="g-pgn">
+    @if (showInfo) {
+      <span class="pgn-info">
+        @if (totalItems > 0) {
+          <strong>{{ startRow }}–{{ endRow }}</strong> of <strong>{{ totalItems }}</strong>
+        } @else { No data }
+      </span>
+    }
+
+    <div class="pgn-pages">
+      <button class="pgn-btn pgn-nav" (click)="goPage(1)"               [disabled]="currentPage === 1">&#171;</button>
+      <button class="pgn-btn pgn-nav" (click)="goPage(currentPage - 1)" [disabled]="currentPage === 1">&#8249;</button>
+
+      @for (p of pageNumbers; track $index) {
+        @if (p === "...") {
+          <span class="pgn-dots">…</span>
+        } @else {
+          <button class="pgn-btn"
+            [class.pgn-active]="p === currentPage"
+            [style.background]="p === currentPage ? color : ''"
+            [style.border-color]="p === currentPage ? color : ''"
+            (click)="goPage(p)">{{ p }}</button>
+        }
+      }
+
+      <button class="pgn-btn pgn-nav" (click)="goPage(currentPage + 1)" [disabled]="currentPage === totalPages">&#8250;</button>
+      <button class="pgn-btn pgn-nav" (click)="goPage(totalPages)"      [disabled]="currentPage === totalPages">&#187;</button>
+    </div>
+
+    @if (showPageSize) {
+      <select class="pgn-size" [value]="pageSizeVal" (change)="changePageSize($any($event.target).value)">
+        @for (s of pageSizeOptions; track s) {
+          <option [value]="s">{{ s }} / page</option>
+        }
+      </select>
+    }
+  </div>
+
+</div>
