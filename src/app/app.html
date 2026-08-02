@@ -49,7 +49,7 @@
     multiSelectCheckboxColor="#6366f1"
     (onChange)="fn($event)"     → single: value, multiple: value[]
   ══════════════════════════════════════════════════════════════════════ -->
-  <app-dropdown
+  <!-- <app-dropdown
     placeholder="Select tech skills"
     [dataArray]="techSkills"
     [multipleSelect]="true"
@@ -65,8 +65,107 @@
     [showIcons]="true"
     multiSelectCheckboxColor="#6366f1"
     (onChange)="skill($event)">
-  </app-dropdown>
+  </app-dropdown> -->
 
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-dropdown2  —  mat-form-field style wrapper
+    ──────────────────────────────────────────────────────────────────────
+    Bilkul mat-form-field ki tarah use karo — <select> andar likhte ho:
+
+    <app-dropdown2 label="Cars">
+      <select #dd2Select [(ngModel)]="selectedCar">
+        <option value="">-- Select --</option>
+        ...options...
+      </select>
+    </app-dropdown2>
+
+    Wrapper inputs (mat-form-field style):
+      label="..."              → upar label
+      [outlined]="false"       → true = outlined border
+      [required]="false"       → asterisk *
+      hint="..."               → niche hint text
+      error="..."              → niche red error
+
+    Rich feature inputs (same as app-dropdown):
+      placeholder="..."
+      [multipleSelect]="true"       → custom UI ON hoga automatically
+      [maxSelect]="3"               → 0 = unlimited
+      [searchFields]="['tags']"     → extra search fields
+      [canSearch]="true"            → ya [showSearchFields]="true/false"
+      grouping="group"              → data-group attribute se aata hai
+      [showGrouping]="true"
+      badges="badge"                → data-badge attribute se aata hai
+      [showBadges]="true"
+      icons="icon"                  → data-icon attribute se aata hai
+      [showIcons]="true"
+      multiSelectCheckboxColor="#6366f1"
+      [loading]="false"
+      [disabled]="false"
+      [readonly]="false"
+      (onChange)="fn($event)"       → single: value | multiple: value[]
+
+    Rich features ke liye option mein data-* attrs lagao:
+      <option [value]="item.value"
+        [attr.data-group]="item.group"
+        [attr.data-badge]="item.badge"
+        [attr.data-icon]="item.icon">{{ item.label }}</option>
+
+    ⚡ MODES:
+      → multipleSelect / dataArray nahi → native <select> styled wrapper
+      → multipleSelect="true" ya [dataArray] → custom dropdown UI
+  ══════════════════════════════════════════════════════════════════════ -->
+
+
+
+
+
+
+
+
+ 
+    <app-dropdown2
+      label="Tech Skills"
+      [outlined]="true"
+      [required]="true"
+      placeholder="Select tech skills"
+      [multipleSelect]="true"
+      [maxSelect]="0"
+      [searchFields]="['tags']"
+      [showSearchFields]="true"
+      grouping="group"
+      [showGrouping]="true"
+      badges="badge"
+      [showBadges]="true"
+      icons="icon"
+      [showIcons]="true"
+      multiSelectCheckboxColor="#6366f1"
+      (onChange)="skill($event)">
+      <select #mksDropdown [(ngModel)]="dd2SelectedValues">
+        <option value="">-- Select --</option>
+        @for (skill of techSkills; track $index) {
+          <option
+            [value]="skill.email"
+         
+            >{{ skill.email }}</option>
+        }
+      </select>
+    </app-dropdown2>
+   
+      <p style="margin-top:6px;color:#6366f1;font-size:13px">
+        Selected: <strong>{{ dd2SelectedValues }}</strong>
+      </p>
+ 
+
+   <!-- [disabled]="skill.disabled"
+            [attr.data-group]="skill.group"
+            [attr.data-badge]="skill.badge"
+            [attr.data-icon]="skill.icon" -->
+
+
+
+
+  
 
   <!-- ══════════════════════════════════════════════════════════════════════
     app-toggle

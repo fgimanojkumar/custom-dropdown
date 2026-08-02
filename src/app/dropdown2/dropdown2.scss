@@ -1,0 +1,623 @@
+// -- Variables --------------------------------------------------------------
+$primary:       #6366f1;
+$primary-dark:  #4f46e5;
+$primary-light: #eef2ff;
+$primary-mid:   #c7d2fe;
+$text-dark:     #0f172a;
+$text-mid:      #475569;
+$text-light:    #94a3b8;
+$border:        #e2e8f0;
+$border-focus:  #a5b4fc;
+$bg-white:      #ffffff;
+$bg-subtle:     #f8fafc;
+$bg-hover:      #f1f5f9;
+$red:           #ef4444;
+$red-light:     #fee2e2;
+$radius-sm:     6px;
+$radius:        10px;
+$radius-lg:     14px;
+$shadow-sm:     0 1px 2px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+$shadow-md:     0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
+$shadow-lg:     0 10px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.06);
+$shadow-focus:  0 0 0 3px rgba(99,102,241,.18);
+$transition:    all .18s cubic-bezier(.4,0,.2,1);
+
+// -- Host -------------------------------------------------------------------
+:host {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  color: $text-dark;
+}
+
+// -- Wrapper ----------------------------------------------------------------
+.dd2-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+
+  &.dd2-disabled { opacity: .5; pointer-events: none; }
+  &.dd2-readonly  { .dd2-trigger, .dd2-select-box { cursor: default; } }
+
+  &.dd2-has-error {
+    .dd2-trigger, .dd2-select-box { border-color: $red; }
+    .dd2-label { color: $red; }
+    .dd2-native-arrow { color: $red; }
+  }
+}
+
+// -- Label ------------------------------------------------------------------
+.dd2-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: .78rem;
+  font-weight: 600;
+  color: $text-mid;
+  margin-bottom: 6px;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  transition: color $transition;
+
+  .dd2-asterisk { color: $red; font-size: .8rem; }
+
+  .dd2-open &  { color: $primary; }
+}
+
+// -- Trigger ----------------------------------------------------------------
+.dd2-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 8px 40px 8px 14px;
+  background: $bg-white;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: $transition;
+  box-sizing: border-box;
+  gap: 6px;
+
+  &:hover {
+    border-color: $border-focus;
+    box-shadow: $shadow-sm, 0 0 0 1px $border-focus;
+  }
+
+  .dd2-open & {
+    border-color: $primary;
+    box-shadow: $shadow-sm, $shadow-focus;
+  }
+
+  .dd2-outlined & {
+    border-width: 2px;
+    border-color: $primary-mid;
+    border-radius: $radius;
+    &:hover { border-color: $primary; }
+  }
+
+  .dd2-open.dd2-outlined & {
+    border-color: $primary;
+    box-shadow: $shadow-sm, $shadow-focus;
+  }
+}
+
+// -- Value area -------------------------------------------------------------
+.dd2-value {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.dd2-placeholder {
+  color: $text-light;
+  font-size: .9rem;
+  user-select: none;
+}
+
+.dd2-selected-text {
+  font-size: .9rem;
+  color: $text-dark;
+  font-weight: 500;
+}
+
+// -- Tags -------------------------------------------------------------------
+.dd2-tags-row { display: flex; flex-wrap: nowrap; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+.dd2-tags-row::-webkit-scrollbar { display: none; }
+
+.dd2-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, $primary-light, #e0e7ff);
+  color: $primary-dark;
+  border: 1px solid $primary-mid;
+  border-radius: 20px;
+  padding: 3px 10px 3px 10px;
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: $transition;
+
+  &:hover { background: $primary-mid; }
+}
+
+.dd2-tag-text { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dd2-tag-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: rgba($primary, .15);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: $primary-dark;
+  font-size: .65rem;
+  padding: 0;
+  line-height: 1;
+  transition: $transition;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $red;
+    color: #fff;
+  }
+}
+
+// -- Clear button -----------------------------------------------------------
+.dd2-clear {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: $bg-subtle;
+  border: 1px solid $border;
+  border-radius: 50%;
+  cursor: pointer;
+  color: $text-light;
+  font-size: .7rem;
+  padding: 0;
+  transition: $transition;
+
+  &:hover {
+    background: $red-light;
+    border-color: $red;
+    color: $red;
+  }
+}
+
+// -- Arrow ------------------------------------------------------------------
+.dd2-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78rem;
+  color: $text-light;
+  background: $bg-subtle;
+  pointer-events: none;
+  transition: $transition;
+
+  &.open {
+    transform: translateY(-50%) rotate(180deg);
+    color: $primary;
+    background: $primary-light;
+  }
+}
+
+// -- Loading ----------------------------------------------------------------
+.dd2-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  color: $text-mid;
+  font-size: .85rem;
+  background: $bg-subtle;
+  border: 1.5px solid $border;
+  border-top: none;
+  border-radius: 0 0 $radius $radius;
+}
+
+.dd2-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid $primary-mid;
+  border-top-color: $primary;
+  animation: dd2-spin .7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dd2-spin { to { transform: rotate(360deg); } }
+
+// -- Panel ------------------------------------------------------------------
+.dd2-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: $bg-white;
+  border: 1.5px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  max-height: 340px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  animation: dd2-slide-in .14s cubic-bezier(.4,0,.2,1);
+
+  // Custom scrollbar
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: $border; border-radius: 99px; }
+  &::-webkit-scrollbar-thumb:hover { background: $text-light; }
+}
+
+@keyframes dd2-slide-in {
+  from { opacity: 0; transform: translateY(-6px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+
+// -- Search wrap ------------------------------------------------------------
+.dd2-search-wrap {
+  padding: 10px 10px 6px;
+  border-bottom: 1px solid $border;
+  background: $bg-subtle;
+  border-radius: $radius-lg $radius-lg 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.dd2-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: $bg-white;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  padding: 7px 10px;
+  transition: $transition;
+
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: $shadow-focus;
+  }
+}
+
+.dd2-search-icon {
+  color: $text-light;
+  font-size: .85rem;
+  flex-shrink: 0;
+}
+
+.dd2-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: .875rem;
+  color: $text-dark;
+  font-family: inherit;
+
+  &::placeholder { color: $text-light; }
+}
+
+.dd2-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: $bg-subtle;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: $text-light;
+  font-size: .65rem;
+  padding: 0;
+  transition: $transition;
+
+  &:hover { background: $red-light; color: $red; }
+}
+
+// -- Multi-select bar -------------------------------------------------------
+.dd2-multi-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 2px;
+}
+
+.dd2-select-all-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  color: $text-mid;
+  font-size: .8rem;
+  font-weight: 500;
+  user-select: none;
+
+  input[type=checkbox] { cursor: pointer; accent-color: $primary; }
+}
+
+.dd2-count-badge {
+  background: $primary;
+  color: #fff;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  min-width: 22px;
+  text-align: center;
+}
+
+.dd2-clear-all {
+  background: none;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  color: $text-mid;
+  font-size: .75rem;
+  padding: 2px 8px;
+  transition: $transition;
+
+  &:hover { border-color: $red; color: $red; background: $red-light; }
+}
+
+.dd2-limit-badge {
+  margin-left: auto;
+  font-size: .75rem;
+  color: $text-light;
+  font-weight: 600;
+  background: $bg-subtle;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 2px 7px;
+
+  &.reached {
+    color: $red;
+    background: $red-light;
+    border-color: lighten($red, 30%);
+  }
+}
+
+// -- Option list ------------------------------------------------------------
+.dd2-options-list { padding: 5px 0; }
+
+.dd2-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-size: .875rem;
+  color: $text-dark;
+  transition: background .1s;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background: $bg-hover;
+    border-left-color: $primary-mid;
+  }
+
+  &.focused {
+    background: $primary-light;
+    border-left-color: $primary;
+  }
+
+  &.selected {
+    background: $primary-light;
+    border-left-color: $primary;
+    color: $primary-dark;
+
+    .dd2-option-label { font-weight: 600; }
+  }
+
+  &.disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.dd2-checkbox {
+  accent-color: $primary;
+  cursor: pointer;
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+.dd2-option-label {
+  flex: 1;
+  cursor: pointer;
+  line-height: 1.4;
+
+  &.disabled-label { cursor: not-allowed; }
+}
+
+.dd2-icon { font-size: 1.05rem; flex-shrink: 0; }
+
+.dd2-badge {
+  flex-shrink: 0;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: .68rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: .02em;
+}
+
+.dd2-check-mark {
+  flex-shrink: 0;
+  color: $primary;
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+.dd2-lock { flex-shrink: 0; font-size: .8rem; color: $text-light; }
+
+// -- Group header -----------------------------------------------------------
+.dd2-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: .68rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  margin-top: 4px;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,.3);
+  }
+}
+
+// -- Misc -------------------------------------------------------------------
+.dd2-divider        { height: 1px; background: $border; margin: 4px 8px; }
+.dd2-history-header { padding: 7px 14px; font-size: .75rem; color: $text-light; font-weight: 500; }
+.dd2-history-item   { font-style: italic; color: $text-mid; }
+
+.dd2-empty {
+  padding: 20px 14px;
+  text-align: center;
+  color: $text-light;
+  font-size: .85rem;
+
+  &::before { content: '?? '; }
+}
+
+.dd2-limit-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 8px;
+  padding: 8px 12px;
+  font-size: .8rem;
+  color: $red;
+  background: $red-light;
+  border: 1px solid lighten($red, 28%);
+  border-radius: $radius-sm;
+  font-weight: 500;
+}
+
+// -- Native select box (simple mode) ---------------------------------------
+.dd2-select-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: $bg-white;
+  border: 1.5px solid $border;
+  border-radius: $radius;
+  box-shadow: $shadow-sm;
+  transition: $transition;
+  min-height: 46px;
+
+  &:hover {
+    border-color: $border-focus;
+    box-shadow: $shadow-sm, 0 0 0 1px $border-focus;
+  }
+
+  .dd2-focused & {
+    border-color: $primary;
+    box-shadow: $shadow-sm, $shadow-focus;
+  }
+
+  .dd2-outlined & {
+    border-width: 2px;
+    border-color: $primary-mid;
+    &:hover { border-color: $primary; }
+  }
+
+  .dd2-has-error & { border-color: $red; }
+
+  ::ng-deep select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: .9rem;
+    font-family: inherit;
+    color: $text-dark;
+    padding: 11px 38px 11px 14px;
+    cursor: pointer;
+    line-height: 1.5;
+
+    option           { color: $text-dark; background: $bg-white; }
+    option:disabled  { color: $text-light; }
+    &:disabled       { cursor: not-allowed; color: $text-light; }
+  }
+}
+
+.dd2-native-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: $radius-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78rem;
+  color: $text-light;
+  background: $bg-subtle;
+  pointer-events: none;
+  transition: $transition;
+
+  .dd2-focused & { color: $primary; background: $primary-light; }
+}
+
+.dd2-outlined .dd2-native-arrow { color: $primary; }
+
+.dd2-hidden { display: none !important; }
+
+// -- Hint / Error -----------------------------------------------------------
+.dd2-hint {
+  display: block;
+  font-size: .73rem;
+  color: $text-light;
+  margin-top: 5px;
+  padding-left: 2px;
+
+  &.dd2-error-text {
+    color: $red;
+    font-weight: 500;
+
+    &::before { content: '? '; }
+  }
+}

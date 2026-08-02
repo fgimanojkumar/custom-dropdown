@@ -1,0 +1,156 @@
+<div
+  class="dd2-wrapper"
+  [class.dd2-focused]="focused && !useCustomUI()"
+  [class.dd2-disabled]="disabled"
+  [class.dd2-readonly]="readonly"
+  [class.dd2-outlined]="outlined"
+  [class.dd2-required]="required"
+  [class.dd2-has-error]="!!error"
+  [class.dd2-open]="showDropdown && useCustomUI()"
+  tabindex="0">
+
+  <!-- Label -->
+  @if (label) {
+    <label class="dd2-label">{{ label }}@if (required) {<span class="dd2-asterisk"> *</span>}</label>
+  }
+
+  <!-- -- CUSTOM UI MODE (multipleSelect OR explicit [dataArray]) -- -->
+  @if (useCustomUI()) {
+
+    <!-- Trigger -->
+    <div class="dd2-trigger" (click)="toggleDropdown()">
+      <div class="dd2-value">
+        @if (!multipleSelect) {
+          @if (selectedLabel()) {
+            <span class="dd2-selected-text">{{ selectedLabel() }}</span>
+          } @else {
+            <span class="dd2-placeholder">{{ placeholder }}</span>
+          }
+        }
+        @if (multipleSelect) {
+          @if (selectedValueArr.length > 0) {
+            <span class="dd2-tags-row">
+              @for (val of selectedValueArr; track val) {
+                <span class="dd2-tag">
+                  <span class="dd2-tag-text">{{ getLabelForVal(val) }}</span>
+                  @if (!readonly && !disabled) {
+                    <button class="dd2-tag-remove" (click)="removeTag($event, val)" type="button">&#10005;</button>
+                  }
+                </span>
+              }
+            </span>
+          } @else {
+            <span class="dd2-placeholder">{{ placeholder }}</span>
+          }
+        }
+      </div>
+      @if (!multipleSelect && selectedLabel() && !readonly && !disabled) {
+        <button class="dd2-clear" (click)="clearAll($event)" type="button" aria-label="Clear">&#10005;</button>
+      }
+      <span class="dd2-arrow" [class.open]="showDropdown">&#9662;</span>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="dd2-loading"><span class="dd2-spinner"></span><span>Loading�</span></div>
+    }
+
+    <!-- Dropdown Panel -->
+    @if (!loading && showDropdown) {
+      <div class="dd2-panel" role="listbox" [attr.aria-multiselectable]="multipleSelect">
+
+        <!-- Search -->
+        @if (canSearch && dataArray.length > 0) {
+          <div class="dd2-search-wrap">
+            <div class="dd2-search-row">
+              <span class="dd2-search-icon">&#128269;</span>
+              <input type="text" #searchInput [(ngModel)]="searchText" placeholder="Search..."
+                autofocus="true" class="dd2-search-input" aria-label="Search options">
+              @if (searchText) { <button class="dd2-search-clear" (click)="clearSearch($event)">&#10005;</button> }
+            </div>
+            @if (multipleSelect) {
+              <div class="dd2-multi-bar">
+                <label class="dd2-select-all-label">
+                  <input type="checkbox" class="dd2-checkbox"
+                    [checked]="allSelectChecked"
+                    [indeterminate]="indeterminate()"
+                    [ngStyle]="{'accent-color': checkboxColor}"
+                    (change)="selectAll($event)"
+                    aria-label="Select all">
+                  Select All
+                </label>
+                @if (selectedCount() > 0) {
+                  <span class="dd2-count-badge">{{ selectedCount() }}</span>
+                  <button class="dd2-clear-all" (click)="clearAll($event)" type="button">Clear</button>
+                }
+                @if (maxSelect > 0) {
+                  <span class="dd2-limit-badge" [class.reached]="limitReached()">{{ selectedCount() }}/{{ maxSelect }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (canSearch && filteredData().length === 0 && dataArray.length > 0) { <div class="dd2-empty">No results found.</div> }
+        @if (dataArray.length === 0) { <div class="dd2-empty">No data available.</div> }
+        @if (limitReached() && multipleSelect) { <div class="dd2-limit-error">&#9888; Max {{ maxSelect }} item{{ maxSelect === 1 ? '' : 's' }} can be selected</div> }
+
+        @if (showRecentHistory && recentHistory.length > 0) {
+          <div class="dd2-history-header">&#128336; Recent</div>
+          @for (val of recentHistory; track val) { <div class="dd2-option dd2-history-item">{{ getLabelForVal(val) }}</div> }
+          <div class="dd2-divider"></div>
+        }
+
+        <div class="dd2-options-list">
+          @if (groupedData() && showGrouping) {
+            @for (grp of groupedData(); track grp.group) {
+              <div class="dd2-group-header" [ngStyle]="{'background': groupingColor}">{{ grp.group }}</div>
+              @for (item of grp.options; track item._idx; let i = $index) {
+                <div class="dd2-option" [class.selected]="isChecked(item)" [class.disabled]="isItemDisabled(item)"
+                  [class.focused]="focusedIndex === i" (click)="toggleItem(item)"
+                  role="option" [attr.aria-selected]="isChecked(item)" [attr.aria-disabled]="isItemDisabled(item) || null">
+                  @if (multipleSelect) { <input type="checkbox" class="dd2-checkbox" [checked]="isChecked(item)" [disabled]="isItemDisabled(item)" [ngStyle]="{'accent-color': checkboxColor}" (click)="onCheckboxClick($event, item)" (change)="toggleItem(item)"> }
+                  @if (showIcons && getIcon(item)) { <span class="dd2-icon">{{ getIcon(item) }}</span> }
+                  <label class="dd2-option-label" [class.disabled-label]="isItemDisabled(item)" (click)="onLabelClick($event, item)">{{ getLabel(item) }}</label>
+                  @if (showBadges && getBadge(item)) { <span class="dd2-badge" [ngStyle]="{'background': getBadgeColor(item)}">{{ getBadge(item) }}</span> }
+                  @if (!multipleSelect && isChecked(item)) { <span class="dd2-check-mark">&#10003;</span> }
+                  @if (isItemDisabled(item)) { <span class="dd2-lock">&#128274;</span> }
+                </div>
+              }
+            }
+          } @else {
+            @for (item of filteredData(); track item._idx; let i = $index) {
+              <div class="dd2-option" [class.selected]="isChecked(item)" [class.disabled]="isItemDisabled(item)"
+                [class.focused]="focusedIndex === i" (click)="toggleItem(item)"
+                role="option" [attr.aria-selected]="isChecked(item)" [attr.aria-disabled]="isItemDisabled(item) || null">
+                @if (multipleSelect) { <input type="checkbox" class="dd2-checkbox" [checked]="isChecked(item)" [disabled]="isItemDisabled(item)" [ngStyle]="{'accent-color': checkboxColor}" (click)="onCheckboxClick($event, item)" (change)="toggleItem(item)"> }
+                @if (showIcons && getIcon(item)) { <span class="dd2-icon">{{ getIcon(item) }}</span> }
+                <label class="dd2-option-label" [class.disabled-label]="isItemDisabled(item)" (click)="onLabelClick($event, item)">{{ getLabel(item) }}</label>
+                @if (showBadges && getBadge(item)) { <span class="dd2-badge" [ngStyle]="{'background': getBadgeColor(item)}">{{ getBadge(item) }}</span> }
+                @if (!multipleSelect && isChecked(item)) { <span class="dd2-check-mark">&#10003;</span> }
+                @if (isItemDisabled(item)) { <span class="dd2-lock">&#128274;</span> }
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+
+  }
+
+  <!-- -- NATIVE SELECT BOX --
+       Always in DOM (needed for [(ngModel)] binding).
+       Visually hidden in custom-UI mode. -->
+  <div class="dd2-select-box" [class.dd2-hidden]="useCustomUI()">
+    <ng-content select="select"></ng-content>
+    <span class="dd2-native-arrow">&#9662;</span>
+  </div>
+
+  <!-- Hint / Error -->
+  @if (error) {
+    <span class="dd2-hint dd2-error-text">{{ error }}</span>
+  } @else if (hint) {
+    <span class="dd2-hint">{{ hint }}</span>
+  }
+
+</div>

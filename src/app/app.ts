@@ -1,8 +1,9 @@
 ﻿import { Component, signal, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule } from '@angular/forms';
 import { Dropdown, DropdownOption } from './dropdown/dropdown';
+import { Dropdown2 } from './dropdown2/dropdown2';
 import { Toggle } from './toggle/toggle';
 import { Range } from './range/range';
 import { Loader } from './loader/loader';
@@ -16,7 +17,7 @@ import { Grid, GridCol } from './grid/grid';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, Dropdown, Toggle, Range, Loader, Calendar, Rating, Pagination, Sort, Grid],
+  imports: [RouterOutlet, CommonModule, FormsModule, Dropdown, Dropdown2, Toggle, Range, Loader, Calendar, Rating, Pagination, Sort, Grid],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -37,21 +38,54 @@ export class App {
   ];
 
   // Object array with groups + icons + badges + disabled
-  techSkills: DropdownOption[] = [
-    { label: 'Angular', value: 'angular', group: 'Frontend', badgeColor: '#dd0031' },
-    { label: 'React', value: 'react', group: 'Frontend', badge: 'Hot', badgeColor: '#61dafb', tags: ['jsx', 'hooks'] },
-    { label: 'Vue', value: 'vue', group: 'Frontend', badge: 'Stable', badgeColor: '#42b883' },
-    { label: 'Svelte', value: 'svelte', group: 'Frontend', disabled: true },
-    { label: 'Node.js', value: 'nodejs', group: 'Backend', icon: '\u{1F7E2}', badge: 'LTS', badgeColor: '#339933' },
-    { label: 'Django', value: 'django', group: 'Backend', icon: '\u{1F40D}', tags: ['python', 'orm'] },
-    { label: 'Spring', value: 'spring', group: 'Backend', icon: '\u2615', badge: 'Enterprise', badgeColor: '#6aad3d' },
-    { label: 'Laravel', value: 'laravel', group: 'Backend', icon: '\u{1F534}', disabled: true },
-    { label: 'PostgreSQL', value: 'postgresql', group: 'Database', icon: '\u{1F418}', badge: 'Open Source', badgeColor: '#336791' },
-    { label: 'MongoDB', value: 'mongodb', group: 'Database', icon: '\u{1F343}', tags: ['nosql', 'document'] },
-    { label: 'Redis', value: 'redis', group: 'Database', icon: '\u{1F53A}' },
-  ];
+  // techSkills: DropdownOption[] = [
+  //   { label: 'Angular', value: 'angular', group: 'Frontend', badgeColor: '#dd0031' },
+  //   { label: 'React', value: 'react', group: 'Frontend', badge: 'Hot', badgeColor: '#61dafb', tags: ['jsx', 'hooks'] },
+  //   { label: 'Vue', value: 'vue', group: 'Frontend', badge: 'Stable', badgeColor: '#42b883' },
+  //   { label: 'Svelte', value: 'svelte', group: 'Frontend', disabled: true },
+  //   { label: 'Node.js', value: 'nodejs', group: 'Backend', icon: '\u{1F7E2}', badge: 'LTS', badgeColor: '#339933' },
+  //   { label: 'Django', value: 'django', group: 'Backend', icon: '\u{1F40D}', tags: ['python', 'orm'] },
+  //   { label: 'Spring', value: 'spring', group: 'Backend', icon: '\u2615', badge: 'Enterprise', badgeColor: '#6aad3d' },
+  //   { label: 'Laravel', value: 'laravel', group: 'Backend', icon: '\u{1F534}', disabled: true },
+  //   { label: 'PostgreSQL', value: 'postgresql', group: 'Database', icon: '\u{1F418}', badge: 'Open Source', badgeColor: '#336791' },
+  //   { label: 'MongoDB', value: 'mongodb', group: 'Database', icon: '\u{1F343}', tags: ['nosql', 'document'] },
+  //   { label: 'Redis', value: 'redis', group: 'Database', icon: '\u{1F53A}' },
+  // ];
 
- 
+
+
+
+  techSkills =  [
+    {
+        id: 1,
+        name: "Amit Sharma",
+        email: "amit@example.com",
+        address: { // Nested Object
+            city: "Mumbai",
+            pincode: 400001
+        },
+        skills: ["JavaScript", "React", "Node.js"] // Nested Array
+    },
+    {
+        id: 2,
+        name: "Priya Verma",
+        email: "priya@example.com",
+        address: { // Nested Object
+            city: "Delhi",
+            pincode: 110001
+        },
+        skills: ["Python", "Data Science", "Machine Learning"] // Nested Array
+    }
+];
+
+
+
+
+
+
+
+
+
   asyncData: string[] = [];
   isLoading = false;
 
@@ -66,34 +100,63 @@ export class App {
 
   pins = ['243001', '201301', '750001', '800001'];
 
+  // Dropdown2 — yahan apna koi bhi array bind karo
+  fruitOptions = [
+    { label: 'Apple', value: 'apple', group: 'Fruits', icon: '🍎', badge: 'Fresh', badgeColor: '#e53e3e' },
+    { label: 'Banana', value: 'banana', group: 'Fruits', icon: '🍌' },
+    { label: 'Mango', value: 'mango', group: 'Fruits', icon: '🥭', badge: 'Season', badgeColor: '#dd6b20' },
+    { label: 'Orange', value: 'orange', group: 'Fruits', icon: '🍊' },
+    { label: 'Grapes', value: 'grapes', group: 'Fruits', icon: '🍇', disabled: true },
+    { label: 'Carrot', value: 'carrot', group: 'Vegetables', icon: '🥕' },
+    { label: 'Broccoli', value: 'broccoli', group: 'Vegetables', icon: '🥦' },
+    { label: 'Tomato', value: 'tomato', group: 'Vegetables', icon: '🍅', badge: 'Organic', badgeColor: '#38a169' },
+    { label: 'Spinach', value: 'spinach', group: 'Vegetables', icon: '🌿', disabled: true },
+  ];
+  dd2SelectedValue: any = null;
+  dd2SelectedValues: any[] = [];
+  onFruitChange(val: any) {
+    this.dd2SelectedValue = val;
+    console.log('Dropdown2 selected:', val);
+  }
+  onFruitMultiChange(vals: any[]) {
+    this.dd2SelectedValues = vals;
+    console.log('Dropdown2 multi:', vals);
+  }
+
   parentValue: any;
   parentValue2: any;
   parentValue3: any;
   parentValue4: any;
 
 
- 
+
 
 
   constructor(private cdr: ChangeDetectorRef, private fb: FormBuilder) { }
 
   state(value: any) { this.parentValue = value; console.log('state:', value); }
-  skill(value: any) { this.parentValue2 = value; console.log('skill:', value); }
+ 
+  skill(value: any) {
+    this.parentValue2 = value;
+    console.log('skill:', value);
+    this.dd2SelectedValues=value;
+  }
+
   pin(value: any) { this.parentValue3 = value; console.log('pin:', value); }
   async_(value: any) { this.parentValue4 = value; console.log('async:', value); }
 
 
-// #######################################################
+  // #######################################################
 
 
- toggleChanged(value: boolean) {
-  console.log(value); // true / false
-}
+  toggleChanged(value: boolean) {
+    console.log(value); // true / false
+  }
 
-// ####################3###############################3
+  // ####################3###############################3
 
 
-onTableSelect(rows: any[]) { console.log('selected:', rows); }
+  onTableSelect(rows: any[]) { console.log('selected:', rows); }
   onSortChanged(sort: { key: string; dir: 'asc' | 'desc' }) { console.log('sort:', sort); }
   // ── Server-side example ───────────────────────────────────────────────────
   serverData: any[] = [];       // API se aaya hua current page ka data
@@ -124,25 +187,25 @@ onTableSelect(rows: any[]) { console.log('selected:', rows); }
 
   // ── Grid cols ─────────────────────────────────────────────────────────────
   tableData = [
-    { name: 'Rahul Sharma',   role: 'Admin',   status: 'Active',   joined: '2024-01-15', verified: true  },
-    { name: 'Priya Singh',    role: 'Manager', status: 'Active',   joined: '2024-03-20', verified: true  },
-    { name: 'Amit Verma',     role: 'User',    status: 'Inactive', joined: '2024-05-10', verified: false },
-    { name: 'Neha Gupta',     role: 'User',    status: 'Active',   joined: '2024-06-01', verified: true  },
-    { name: 'Rohit Kumar',    role: 'Intern',  status: 'Pending',  joined: '2024-07-22', verified: false },
-    { name: 'Sunita Patel',   role: 'Manager', status: 'Active',   joined: '2023-11-05', verified: true  },
-    { name: 'Vijay Reddy',    role: 'User',    status: 'Active',   joined: '2024-02-18', verified: true  },
-    { name: 'Kavya Joshi',    role: 'Admin',   status: 'Active',   joined: '2023-09-30', verified: true  },
-    { name: 'Deepak Nair',    role: 'User',    status: 'Inactive', joined: '2024-04-14', verified: false },
-    { name: 'Anita Mishra',   role: 'Intern',  status: 'Pending',  joined: '2024-08-01', verified: false },
-    { name: 'Suresh Pillai',  role: 'User',    status: 'Active',   joined: '2024-01-28', verified: true  },
-    { name: 'Meena Iyer',     role: 'Manager', status: 'Active',   joined: '2023-12-15', verified: true  },
+    { name: 'Rahul Sharma', role: 'Admin', status: 'Active', joined: '2024-01-15', verified: true },
+    { name: 'Priya Singh', role: 'Manager', status: 'Active', joined: '2024-03-20', verified: true },
+    { name: 'Amit Verma', role: 'User', status: 'Inactive', joined: '2024-05-10', verified: false },
+    { name: 'Neha Gupta', role: 'User', status: 'Active', joined: '2024-06-01', verified: true },
+    { name: 'Rohit Kumar', role: 'Intern', status: 'Pending', joined: '2024-07-22', verified: false },
+    { name: 'Sunita Patel', role: 'Manager', status: 'Active', joined: '2023-11-05', verified: true },
+    { name: 'Vijay Reddy', role: 'User', status: 'Active', joined: '2024-02-18', verified: true },
+    { name: 'Kavya Joshi', role: 'Admin', status: 'Active', joined: '2023-09-30', verified: true },
+    { name: 'Deepak Nair', role: 'User', status: 'Inactive', joined: '2024-04-14', verified: false },
+    { name: 'Anita Mishra', role: 'Intern', status: 'Pending', joined: '2024-08-01', verified: false },
+    { name: 'Suresh Pillai', role: 'User', status: 'Active', joined: '2024-01-28', verified: true },
+    { name: 'Meena Iyer', role: 'Manager', status: 'Active', joined: '2023-12-15', verified: true },
   ];
 
   gridCols: GridCol[] = [
-    { key: 'name',     label: 'Name',     sort: true },
-    { key: 'role',     label: 'Role',     sort: true },
-    { key: 'status',   label: 'Status',   sort: true },
-    { key: 'joined',   label: 'Joined',   sort: true },
+    { key: 'name', label: 'Name', sort: true },
+    { key: 'role', label: 'Role', sort: true },
+    { key: 'status', label: 'Status', sort: true },
+    { key: 'joined', label: 'Joined', sort: true },
     { key: 'verified', label: 'Verified', align: 'center' },
   ];
 
@@ -153,13 +216,13 @@ onTableSelect(rows: any[]) { console.log('selected:', rows); }
   ratingValue = 0;
   ratingChanged(v: number) { this.ratingValue = v; console.log('rating:', v); }
 
-  
+
 
   // Calendar min/max (today ± 30 days example)
   minDate = new Date(new Date().setDate(new Date().getDate() - 30));
   maxDate = new Date(new Date().setDate(new Date().getDate() + 60));
 
-// ###################3##############################3
+  // ###################3##############################3
 
 
 
