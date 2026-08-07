@@ -1,12 +1,23 @@
-﻿import { Component, signal, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormsModule } from '@angular/forms';
-import { Dropdown, DropdownOption } from './dropdown/dropdown';
+import { FormBuilder, FormsModule } from '@angular/forms'; 
 import { Dropdown2 } from './dropdown2/dropdown2';
 import { Toggle } from './toggle/toggle';
 import { Range } from './range/range';
 import { Loader } from './loader/loader';
+import { LoaderService } from './loader/loader.service';
+import { FilterSheet } from './filter-sheet/filter-sheet';
+import { FilterSheetService, FilterResult } from './filter-sheet/filter-sheet.service';
+import { Progress } from './progress/progress';
+import { ToastComponent } from './toast/toast';
+import { ToastService } from './toast/toast.service';
+import { Otp } from './otp/otp';
+import { FileUpload } from './file-upload/file-upload';
+import { NumberInput } from './number-input/number-input';
+import { ImageCropper } from './image-cropper/image-cropper';
+import { ImageCropperService } from './image-cropper/image-cropper.service';
+import { MultiStepper, StepItem } from './multi-stepper/multi-stepper';
 import { Calendar } from './calendar/calendar';
 import { Rating } from './rating/rating';
 import { Pagination, PageChangeEvent } from './pagination/pagination';
@@ -17,14 +28,70 @@ import { Grid, GridCol } from './grid/grid';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, FormsModule, Dropdown, Dropdown2, Toggle, Range, Loader, Calendar, Rating, Pagination, Sort, Grid],
+  imports: [RouterOutlet, CommonModule, FormsModule, Dropdown2, Toggle, Range, Loader, FilterSheet, Progress, ToastComponent, Otp, FileUpload, NumberInput, ImageCropper, MultiStepper, Calendar, Rating, Pagination, Sort, Grid],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
   protected readonly title = signal('my-dropdown');
 
-  isLoaderLoading = true;
+  private loaderService      = inject(LoaderService);
+  private filterSheetService = inject(FilterSheetService);
+  readonly toastSvc          = inject(ToastService);
+  readonly imageCropperSvc   = inject(ImageCropperService);
+
+  filterResult = signal<FilterResult | null>(null);
+
+  // Progress demo
+  pgValue  = signal(65);
+  pgBuffer = signal(80);
+  pgStep(n: number) { this.pgValue.update(v => Math.min(100, Math.max(0, v + n))); }
+
+  // OTP demo
+  otpValue = signal('');
+
+  // Image cropper demo
+  croppedImg = signal('');
+
+  // Multi-stepper demo
+  readonly demoSteps: StepItem[] = [
+    { label: 'Account',  description: 'Basic info',    icon: '👤' },
+    { label: 'Details',  description: 'Personal data', icon: '📋' },
+    { label: 'Payment',  description: 'Billing',       icon: '💳' },
+    { label: 'Confirm',  description: 'Review & done', icon: '✅' },
+  ];
+
+  // Number input demo
+  niValue = signal(1);
+
+  showLoader(): void {
+    this.loaderService.show();
+  }
+
+  hideLoader(): void {
+    this.loaderService.hide();
+  }
+
+  openFilter(): void {
+    this.filterSheetService.open({
+      categories: ['Mobiles', 'Laptops', 'Tablets', 'Accessories', 'Cameras', 'Audio'],
+      brands:     ['Apple', 'Samsung', 'OnePlus', 'Sony', 'boAt', 'Xiaomi'],
+      priceMin:   0,
+      priceMax:   150000,
+      colors: [
+        { name: 'Black', hex: '#1e293b' },
+        { name: 'White', hex: '#f1f5f9' },
+        { name: 'Red',   hex: '#ef4444' },
+        { name: 'Blue',  hex: '#3b82f6' },
+        { name: 'Green', hex: '#22c55e' },
+        { name: 'Gold',  hex: '#f59e0b' },
+      ],
+      sizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'],
+    });
+    this.filterSheetService.onApply$.subscribe(result => {
+      this.filterResult.set(result);
+    });
+  }
 
   // Plain string array
   states = [

@@ -25,8 +25,11 @@
     [class.sm]="size === 'sm'"
     [class.md]="size === 'md'"
     [class.lg]="size === 'lg'"
+    [class.has-labels]="hasLabels"
     [style.--on-color]="color"
     [style.--off-color]="offColor"
+    [style.--track-w.px]="trackWidth"
+    [style.--thumb-tx.px]="thumbTranslate"
     (click)="toggle()"
     (keydown)="onKeyDown($event)">
 

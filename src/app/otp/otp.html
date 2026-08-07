@@ -1,0 +1,21 @@
+<div class="otp-wrap" [class]="'otp-' + size">
+  @for (i of indices; track i) {
+    <input
+      #otpBox
+      class="otp-box"
+      [class.otp-filled]="digits()[i]"
+      [type]="masked ? 'password' : 'text'"
+      [value]="digits()[i]"
+      [disabled]="disabled"
+      maxlength="1"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      [style.--otp-color]="color"
+      (input)="onInput(i, $event)"
+      (keydown)="onKeyDown(i, $event)"
+      (paste)="onPaste($event)" />
+    @if (i === sepAfter) {
+      <span class="otp-sep">—</span>
+    }
+  }
+</div>

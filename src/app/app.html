@@ -2,28 +2,373 @@
 
   <h2 style="color:#1e293b;margin-bottom:24px">Component Demo</h2>
 
+  <!-- Global singletons (sirf ek baar — app ke root mein) -->
+  <app-loader></app-loader>
+  <app-toast></app-toast>
+  <app-filter-sheet></app-filter-sheet>
+  <app-image-cropper color="#6366f1" (onCrop)="croppedImg.set($event)"></app-image-cropper>
+
+
   <!-- ══════════════════════════════════════════════════════════════════════
-    app-loader
+    app-loader  ·  app-toast  ·  app-filter-sheet
     ──────────────────────────────────────────────────────────────────────
-    [visible]="bool"     → ts se true/false karo (loader dikhao/chhupao)
-    title="..."          → heading text
-    message="..."        → subtitle text
-    color="#6366f1"      → dot/spinner/bar ka color
-    backdrop="blur|light|dark|transparent"
-    type="dots|spinner|bar|pulse|wave|ring"
-    [showTitle]="true"
-    [showMessage]="true"
-    [fullscreen]="true"  → false karo to inline dikhega
+    LOADER  — LoaderService inject karo, kahi se bhi:
+      loaderService.show({ title, message, color, type, backdrop,
+                           image, showImage, closeOnBackdropClick })
+      loaderService.hide()
+      type: 'dots'|'spinner'|'bar'|'pulse'|'wave'|'ring'
+      backdrop: 'blur'|'light'|'dark'|'transparent'
+
+    TOAST  — ToastService inject karo:
+      toastSvc.success(msg, opts?)   → green
+      toastSvc.error(msg, opts?)     → red
+      toastSvc.warning(msg, opts?)   → yellow
+      toastSvc.info(msg, opts?)      → indigo
+      toastSvc.dismiss(id)           → ek band karo
+      toastSvc.clear()               → sab band karo
+      opts = { title?, duration?(ms, 0=persistent), position? }
+      position: 'top-right'|'top-left'|'top-center'|
+                'bottom-right'|'bottom-left'|'bottom-center'
+
+    FILTER SHEET  — FilterSheetService inject karo:
+      filterSheetSvc.open({ categories, brands, priceMin, priceMax,
+                             colors:[{name,hex}], sizes })
+      filterSheetSvc.onApply$.subscribe(result => ...)
+      filterSheetSvc.onReset$.subscribe(() => ...)
+      result = { sortBy, priceMin, priceMax, categories, brands,
+                 minRating, discount, selectedColors, selectedSizes,
+                 delivery, availability }
+      Gesture: swipe down se close
   ══════════════════════════════════════════════════════════════════════ -->
-  <!-- <app-loader
-    [visible]="isLoaderLoading"
-    title="Loading..."
-    message="Please wait..."
+
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <button (click)="showLoader()" style="padding:8px 20px;background:#6366f1;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">Show Loader</button>
+    <button (click)="hideLoader()" style="padding:8px 20px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">Hide Loader</button>
+    <button (click)="openFilter()" style="padding:8px 20px;background:#0f172a;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">🔽 Open Filters</button>
+  </div>
+
+  @if (filterResult()) {
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#334155">
+      <strong style="color:#6366f1">Applied Filters:</strong>
+      Sort: <b>{{ filterResult()!.sortBy }}</b> &nbsp;|&nbsp;
+      Price: <b>₹{{ filterResult()!.priceMin }} – ₹{{ filterResult()!.priceMax }}</b> &nbsp;|&nbsp;
+      Rating: <b>{{ filterResult()!.minRating > 0 ? filterResult()!.minRating + '+★' : 'Any' }}</b> &nbsp;|&nbsp;
+      Categories: <b>{{ filterResult()!.categories.join(', ') || 'All' }}</b> &nbsp;|&nbsp;
+      Brands: <b>{{ filterResult()!.brands.join(', ') || 'All' }}</b>
+    </div>
+  }
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-progress
+    ──────────────────────────────────────────────────────────────────────
+    [value]="0-100"
+    [buffer]="0-100"           → buffer mode ka secondary bar
+    type="linear|circular"
+    mode="determinate|indeterminate|buffer"
+    size="xs|sm|md|lg|xl"     → linear height
+    color="#6366f1"            → primary fill color
+    color2="#a5b4fc"           → gradient end color (optional)
+    bufferColor="#c7d2fe"
+    trackColor="#e2e8f0"
+    [striped]="false"
+    [animated]="false"         → stripe animation
+    [rounded]="true"
+    [showLabel]="false"
+    label="..."                → custom text, else shows %
+    labelPosition="right|inside|bottom"
+    [thickness]="8"            → circular stroke width
+    [diameter]="80"            → circular size
+  ══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-progress
+    ──────────────────────────────────────────────────────────────────────
+    [value]="0–100"             → fill percentage
+    [buffer]="0–100"            → buffer bar (mode='buffer' ke liye)
+    type="linear|circular"      → bar ya circle
+    mode="determinate|indeterminate|buffer"
+    size="xs|sm|md|lg|xl"       → track height (4/6/10/16/24 px)
+    color="#6366f1"             → fill color
+    color2="#06b6d4"            → gradient end color (optional)
+    bufferColor="#c7d2fe"
+    trackColor="#e2e8f0"
+    [striped]="false"           → diagonal stripes on fill
+    [animated]="false"          → stripe animation (striped=true chahiye)
+    [rounded]="true"            → pill shape
+    [showLabel]="false"
+    label="..."                 → custom text, warna % dikhega
+    labelPosition="right|inside|bottom"
+    [thickness]="8"             → circular stroke width px
+    [diameter]="80"             → circular outer size px
+    (onChange)               → N/A (controlled component)
+  ══════════════════════════════════════════════════════════════════════ -->
+
+  <!-- Interactive demo -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 16px;font-size:1rem">Progress Bar</h3>
+
+    <!-- Controls -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+      <button (click)="pgStep(-10)" style="width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+      <span style="font-size:1.1rem;font-weight:700;color:#6366f1;min-width:46px;text-align:center">{{ pgValue() }}%</span>
+      <button (click)="pgStep(10)"  style="width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- Sizes -->
+      <!-- <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Sizes</span>
+        <app-progress [value]="pgValue()" size="xs" color="#6366f1"></app-progress>
+        <app-progress [value]="pgValue()" size="sm" color="#8b5cf6"></app-progress>
+        <app-progress [value]="pgValue()" size="md" color="#6366f1" [showLabel]="true" labelPosition="right"></app-progress>
+        <app-progress [value]="pgValue()" size="lg" color="#4f46e5" [showLabel]="true" labelPosition="inside"></app-progress>
+        <app-progress [value]="pgValue()" size="xl" color="#6366f1" [showLabel]="true" labelPosition="inside"></app-progress>
+      </div> -->
+
+      <!-- Gradient + Striped animated -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Gradient &amp; Striped</span>
+        <app-progress [value]="pgValue()" size="md" color="#6366f1" color2="#06b6d4"></app-progress>
+        <app-progress [value]="pgValue()" size="md" color="#f59e0b" color2="#ef4444"></app-progress>
+        <app-progress [value]="pgValue()" size="lg" color="#10b981" [striped]="true" [animated]="true" [showLabel]="true" labelPosition="inside"></app-progress>
+        <app-progress [value]="pgValue()" size="lg" color="#6366f1" [striped]="true" [animated]="true" [rounded]="false"></app-progress>
+      </div>
+
+      <!-- Buffer + Indeterminate -->
+      <!-- <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Buffer &amp; Indeterminate</span>
+        <app-progress [value]="pgValue()" [buffer]="pgBuffer()" mode="buffer" size="md" color="#6366f1" bufferColor="#c7d2fe" [showLabel]="true"></app-progress>
+        <app-progress mode="indeterminate" size="sm" color="#6366f1"></app-progress>
+        <app-progress mode="indeterminate" size="md" color="#f59e0b"></app-progress>
+      </div> -->
+
+      <!-- Colors -->
+      <!-- <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Colors</span>
+        <app-progress [value]="pgValue()" size="sm" color="#6366f1"></app-progress>
+        <app-progress [value]="pgValue()" size="sm" color="#10b981"></app-progress>
+        <app-progress [value]="pgValue()" size="sm" color="#f59e0b"></app-progress>
+        <app-progress [value]="pgValue()" size="sm" color="#ef4444"></app-progress>
+        <app-progress [value]="pgValue()" size="sm" color="#8b5cf6"></app-progress>
+      </div> -->
+
+      <!-- Circular -->
+      <!-- <div style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em">Circular</span>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+          <app-progress type="circular" [value]="pgValue()" [diameter]="60"  [thickness]="5"  color="#6366f1" [showLabel]="true"></app-progress>
+          <app-progress type="circular" [value]="pgValue()" [diameter]="80"  [thickness]="7"  color="#10b981" [showLabel]="true"></app-progress>
+          <app-progress type="circular" [value]="pgValue()" [diameter]="100" [thickness]="9"  color="#f59e0b" [showLabel]="true"></app-progress>
+          <app-progress type="circular" [value]="pgValue()" [diameter]="80"  [thickness]="7"  color="#6366f1" color2="#06b6d4" [showLabel]="true"></app-progress>
+          <app-progress type="circular" mode="indeterminate" [diameter]="60" [thickness]="5"  color="#ef4444"></app-progress>
+          <app-progress type="circular" mode="indeterminate" [diameter]="80" [thickness]="7"  color="#6366f1"></app-progress>
+        </div>
+      </div> -->
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-toast  (global singleton — sirf ek baar root mein)
+    ──────────────────────────────────────────────────────────────────────
+    ToastService inject karo → kahi se bhi call karo:
+
+    toastSvc.success(msg, opts?)   → green toast
+    toastSvc.error(msg, opts?)     → red toast
+    toastSvc.warning(msg, opts?)   → yellow toast
+    toastSvc.info(msg, opts?)      → indigo toast
+    toastSvc.show(msg, type, opts) → custom, returns id string
+    toastSvc.dismiss(id)           → ek toast manually band
+    toastSvc.clear()               → sab toasts band
+
+    opts = {
+      title?:    string
+      duration?: number  (ms — 0 = persistent, default 4000)
+      position?: 'top-right'|'top-left'|'top-center'|
+                 'bottom-right'|'bottom-left'|'bottom-center'
+    }
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 14px;font-size:1rem">Toast / Snackbar</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button (click)="toastSvc.success('Profile saved successfully!')" style="padding:8px 16px;background:#22c55e;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">✓ Success</button>
+      <button (click)="toastSvc.error('Something went wrong', {title:'Error'})" style="padding:8px 16px;background:#ef4444;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">✕ Error</button>
+      <button (click)="toastSvc.warning('Session will expire in 5 min')" style="padding:8px 16px;background:#f59e0b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">! Warning</button>
+      <button (click)="toastSvc.info('New update available', {position:'bottom-center',duration:6000})" style="padding:8px 16px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">i Info</button>
+      <button (click)="toastSvc.success('Persistent toast', {duration:0,position:'top-left'})" style="padding:8px 16px;background:#0f172a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📌 Persistent</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-otp
+    ──────────────────────────────────────────────────────────────────────
+    [length]="6"               → kitne boxes (4 ya 6 common hai)
+    [masked]="false"           → true = password dots dikhenge
     color="#6366f1"
-    backdrop="blur"
-    type="dots"
-    [fullscreen]="true">
-  </app-loader> -->
+    size="sm|md|lg"
+    [disabled]="false"
+    (onChange)="fn($event)"    → $event = partial string (jaise type karo)
+    (onComplete)="fn($event)"  → $event = full OTP (jab sab boxes fill)
+
+    Paste support: koi bhi 4/6 digit number paste karo — auto fill
+    Backspace: prev box mein focus chala jaata hai
+    Template ref: #otp → otp.clear() se reset karo
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 14px;font-size:1rem">OTP Input</h3>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div>
+        <p style="font-size:0.75rem;color:#94a3b8;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">6-digit (with separator)</p>
+        <app-otp [length]="6" color="#6366f1" size="md" (onComplete)="otpValue.set($event)"></app-otp>
+      </div>
+      <div>
+        <p style="font-size:0.75rem;color:#94a3b8;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">4-digit masked</p>
+        <app-otp [length]="4" [masked]="true" color="#10b981" size="lg"></app-otp>
+      </div>
+      @if (otpValue()) {
+        <p style="color:#6366f1;font-size:13px;margin:0">OTP: <strong>{{ otpValue() }}</strong></p>
+      }
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-number-input
+    ──────────────────────────────────────────────────────────────────────
+    [value]="0"              → initial value
+    [min]="-Infinity"        → minimum limit
+    [max]="Infinity"         → maximum limit
+    [step]="1"               → increment / decrement step
+    label="..."              → upar label text
+    prefix="₹"               → value se pehle dikhne wala text
+    suffix=" kg"             → value ke baad dikhne wala text
+    size="sm|md|lg"
+    color="#6366f1"
+    [disabled]="false"
+    [readonly]="false"
+    (onChange)="fn($event)"  → $event = number
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 14px;font-size:1rem">Number Input (Stepper)</h3>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end">
+      <app-number-input [value]="1"   [min]="0"   [max]="99"  label="Quantity"    suffix=" pcs"   size="sm" color="#6366f1" (onChange)="niValue.set($event)"></app-number-input>
+      <app-number-input [value]="18"  [min]="0"   [max]="100" label="Age"         suffix=" yrs"   size="md" color="#10b981"></app-number-input>
+      <app-number-input [value]="0.5" [min]="-5"  [max]="5"   label="Temperature" suffix="°C" [step]="0.5" size="lg" color="#f59e0b"></app-number-input>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-file-upload
+    ──────────────────────────────────────────────────────────────────────
+    accept="image/*,.pdf"     → allowed MIME types / extensions
+    [multiple]="true"         → multiple files allow
+    [maxSizeMB]="10"          → ek file ka max size (MB mein)
+    [maxFiles]="20"           → maximum total files
+    color="#6366f1"
+    label="Drop here..."      → dropzone ka text
+    (onSelect)="fn($event)"   → $event = File[] (sirf valid files)
+
+    Template ref  #fu:
+    fu.files()         → signal — UploadedFile[] (id, file, preview?, error?)
+    fu.clear()         → sab files remove
+    fu.remove(id)      → ek file remove
+    fu.validCount      → error-free files ka count
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 14px;font-size:1rem">File Upload</h3>
+    <app-file-upload accept="image/*,.pdf" [maxSizeMB]="5" [multiple]="true" color="#6366f1"
+      label="Drop images or PDFs here"></app-file-upload>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-image-cropper  (global singleton — sirf ek baar root mein)
+    ──────────────────────────────────────────────────────────────────────
+    ImageCropperService inject karo → kahi se bhi call karo:
+
+    imageCropperSvc.open()             → modal popup kholega
+    imageCropperSvc.close()            → modal band karega
+    imageCropperSvc.onCrop$.subscribe(base64 => ...)
+
+    Global tag inputs (app.html mein ek baar):
+    color="#6366f1"
+    [outputQuality]="0.92"             → JPEG quality 0–1
+    (onCrop)="fn($event)"              → $event = base64 string
+    (onCancel)="fn()"
+
+    Crop box controls:
+    → Drag to move
+    → Corner handles (circle) → corner resize
+    → Edge handles (square)  → edge resize
+    → Aspect: Free | 1:1 | 4:3 | 16:9 | Custom W×H + Apply
+    → Backdrop click = cancel + close
+    → Rule-of-thirds grid inside crop box
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 14px;font-size:1rem">Image Cropper</h3>
+    <button (click)="imageCropperSvc.open()" style="padding:10px 22px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:8px">
+      ✂ Open Image Cropper
+    </button>
+    @if (croppedImg()) {
+      <div style="margin-top:14px;display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+        <div>
+          <p style="font-size:0.72rem;color:#94a3b8;margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Cropped Result</p>
+          <img [src]="croppedImg()" style="max-width:200px;max-height:200px;object-fit:contain;border-radius:10px;border:1px solid #e2e8f0;display:block" />
+        </div>
+        <button (click)="croppedImg.set('')" style="margin-top:28px;padding:6px 14px;border:1.5px solid #e2e8f0;background:#fff;border-radius:6px;font-size:12px;cursor:pointer;color:#64748b">✕ Clear</button>
+      </div>
+    }
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+    app-multi-stepper
+    ──────────────────────────────────────────────────────────────────────
+    [steps]="StepItem[]"          → { label, description?, icon?, optional? }
+    color="#6366f1"
+    orientation="horizontal|vertical"
+    [clickable]="true"            → step pe click karke jump kar sako
+    [linear]="true"               → sirf order mein aage badh sako
+    (onStepChange)="fn($event)"   → $event = new step index (0-based)
+
+    Template ref  #s="appMultiStepper":
+    s.currentStep()  → signal — current index
+    s.next()         → agle step, current ko complete mark karta hai
+    s.prev()         → pichle step
+    s.goTo(i)        → specific step (linear mein restricted)
+    s.markComplete() → current complete mark karo, move nahi karo
+    s.reset()        → step 0 par wapas, completedSteps clear
+    s.isFirst        → boolean
+    s.isLast         → boolean
+    s.isCompleted(i) → boolean
+    s.isReachable(i) → boolean (linear mode mein kaam aata hai)
+  ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
+    <h3 style="color:#1e293b;margin:0 0 14px;font-size:1rem">Multi-step Stepper</h3>
+    <app-multi-stepper #ms="appMultiStepper" [steps]="demoSteps" color="#6366f1"></app-multi-stepper>
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:16px;min-height:80px;display:flex;align-items:center;justify-content:center">
+      <div style="text-align:center;color:#64748b;font-size:0.9rem">
+        Step <strong style="color:#6366f1">{{ ms.currentStep() + 1 }}</strong> of {{ demoSteps.length }}
+        — <b>{{ demoSteps[ms.currentStep()].label }}</b>
+        @if (demoSteps[ms.currentStep()].description) {
+          <span> · {{ demoSteps[ms.currentStep()].description }}</span>
+        }
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button (click)="ms.prev()" [disabled]="ms.isFirst" style="padding:9px 20px;background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:#475569;transition:opacity .2s" [style.opacity]="ms.isFirst ? '0.4' : '1'">← Back</button>
+      <button (click)="ms.next()" [disabled]="ms.isLast"  style="padding:9px 20px;background:#6366f1;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600" [style.opacity]="ms.isLast ? '0.5' : '1'">{{ ms.isLast ? '✓ Done' : 'Next →' }}</button>
+      <button (click)="ms.reset()" style="padding:9px 16px;background:#fff;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;font-size:13px;color:#94a3b8">Reset</button>
+    </div>
+
+    <!-- Vertical variant -->
+    <div style="margin-top:24px">
+      <p style="font-size:0.75rem;color:#94a3b8;margin:0 0 10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em">Vertical</p>
+      <app-multi-stepper [steps]="demoSteps" color="#10b981" orientation="vertical"></app-multi-stepper>
+    </div>
+  </div>
 
 
   <!-- ══════════════════════════════════════════════════════════════════════
@@ -184,6 +529,7 @@
     [disabled]="false"
     (onChange)="fn($event)"    → $event = true/false
   ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
   <app-toggle
     [checked]="false"
     color="#10b981"
@@ -218,6 +564,7 @@
     [disabled]="false"
     (onChange)="fn($event)"    → $event = number
   ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
   <app-range
     label="Age Range"
     [min]="18"
@@ -258,8 +605,9 @@
       range    → $event = { start: Date, end: Date }
       multiple → $event = Date[]
   ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
   <app-calendar
-    mode="single"
+    mode="multiple"
     color="#6366f1"
     dateFormat="DD MMM YYYY"
     placeholder="Select a date"
@@ -286,6 +634,7 @@
     [disabled]="false"
     (onChange)="fn($event)"     → $event = number
   ══════════════════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:60px;padding-top:44px;border-top:2px solid #f1f5f9">
   <app-rating
     [max]="5"
     color="#f59e0b"

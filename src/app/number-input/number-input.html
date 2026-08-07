@@ -1,0 +1,30 @@
+<div class="ni-wrap" [class]="'ni-' + size" [class.ni-disabled]="disabled">
+
+  @if (label) { <label class="ni-label">{{ label }}</label> }
+
+  <div class="ni-control" [style.--ni-color]="color">
+    <button class="ni-btn"
+      (click)="decrement()"
+      [disabled]="!canDec || disabled || readonly">−</button>
+
+    @if (prefix) { <span class="ni-affix">{{ prefix }}</span> }
+
+    <input
+      class="ni-input"
+      type="number"
+      [value]="val"
+      [attr.min]="min === -1/0 ? null : min"
+      [attr.max]="max ===  1/0 ? null : max"
+      [attr.step]="step"
+      [disabled]="disabled"
+      [attr.readonly]="readonly ? '' : null"
+      (change)="onInput($event)"
+      (blur)="onInput($event)" />
+
+    @if (suffix) { <span class="ni-affix">{{ suffix }}</span> }
+
+    <button class="ni-btn"
+      (click)="increment()"
+      [disabled]="!canInc || disabled || readonly">+</button>
+  </div>
+</div>

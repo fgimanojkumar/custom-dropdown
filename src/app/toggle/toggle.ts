@@ -96,6 +96,23 @@ export class Toggle {
   // Toggle Action
   // ==========================
 
+  get hasLabels(): boolean { return !!(this.onLabel || this.offLabel); }
+
+  /** Dynamic track width (px) when labels are longer than default size allows */
+  get trackWidth(): number {
+    if (!this.hasLabels) return 0;
+    const longest = Math.max((this.onLabel || '').length, (this.offLabel || '').length);
+    const charPx   = this.size === 'sm' ? 5.5  : this.size === 'lg' ? 7   : 6.2;
+    const thumbPx  = this.size === 'sm' ? 16   : this.size === 'lg' ? 30  : 22;
+    const padding  = this.size === 'sm' ? 5    : this.size === 'lg' ? 9   : 7;
+    return Math.round(thumbPx + longest * charPx + padding * 2 + 8);
+  }
+
+  get thumbTranslate(): number {
+    const thumbPx = this.size === 'sm' ? 16 : this.size === 'lg' ? 30 : 22;
+    return this.trackWidth - thumbPx - 6;
+  }
+
   toggle(): void {
 
     if (this.disabledSignal()) {

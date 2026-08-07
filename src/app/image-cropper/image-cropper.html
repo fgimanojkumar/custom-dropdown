@@ -1,0 +1,99 @@
+@if (svc.visible()) {
+
+  <!-- Modal backdrop — click outside to cancel -->
+  <div class="ic-backdrop" (click)="cancelAndClose()">
+    <div class="ic-modal" (click)="$event.stopPropagation()">
+
+      @if (!imageSrc()) {
+
+        <!-- Drop zone to load image -->
+        <div
+          class="ic-dropzone"
+          [class.ic-dragging]="isDraggingFile()"
+          [style.--ic-color]="color"
+          (dragover)="onFileDragOver($event)"
+          (dragleave)="onFileDragLeave()"
+          (drop)="onFileDrop($event)"
+          (click)="openFilePicker()">
+          <input #fileIn type="file" accept="image/*" style="display:none" (change)="onFileInput($event)" />
+          <div class="ic-dz-icon">🖼️</div>
+          <div class="ic-dz-label">Drop image here or click to select</div>
+          <div class="ic-dz-meta">JPG, PNG, GIF, WebP supported</div>
+        </div>
+
+        <!-- Close button in drop zone mode -->
+        <button class="ic-modal-close" (click)="cancelAndClose()">✕</button>
+
+      } @else {
+
+        <div class="ic-shell">
+
+          <div class="ic-toolbar">
+            <div class="ic-ar-group">
+              @for (opt of [{r: null, l: 'Free'}, {r: 1, l: '1:1'}, {r: 4/3, l: '4:3'}, {r: 16/9, l: '16:9'}]; track opt.l) {
+                <button
+                  class="ic-ar-btn"
+                  [class.active]="activeRatio === opt.r"
+                  [style.--ic-color]="color"
+                  (click)="setAspectRatio(opt.r)">{{ opt.l }}</button>
+              }
+              <!-- Custom W × H inputs -->
+              <div class="ic-custom-size">
+                <input class="ic-size-input" type="number" min="40" placeholder="W"
+                  [ngModel]="customW()" (ngModelChange)="customW.set(+$event)" />
+                <span class="ic-size-x">×</span>
+                <input class="ic-size-input" type="number" min="40" placeholder="H"
+                  [ngModel]="customH()" (ngModelChange)="customH.set(+$event)" />
+                <button class="ic-size-apply" [style.--ic-color]="color" (click)="applyCustomSize()">Apply</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="ic-change-btn" (click)="reset()">Change Image</button>
+              <button class="ic-change-btn" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.4)" (click)="cancelAndClose()">✕</button>
+            </div>
+          </div>
+
+          <div #container class="ic-container">
+            <img #img [src]="imageSrc()" class="ic-img" draggable="false" alt="" />
+
+            <div
+              class="ic-crop-box"
+              [style.left.px]="cropX()"
+              [style.top.px]="cropY()"
+              [style.width.px]="cropW()"
+              [style.height.px]="cropH()"
+              (mousedown)="startMove($event)"
+              (touchstart)="startMove($event)">
+
+              <div class="ic-grid">
+                <div class="ic-grid-col"></div>
+                <div class="ic-grid-col"></div>
+                <div class="ic-grid-row"></div>
+                <div class="ic-grid-row"></div>
+              </div>
+
+              <div class="ic-h ic-nw" (mousedown)="startResize($event,'nw')" (touchstart)="startResize($event,'nw')"></div>
+              <div class="ic-h ic-ne" (mousedown)="startResize($event,'ne')" (touchstart)="startResize($event,'ne')"></div>
+              <div class="ic-h ic-sw" (mousedown)="startResize($event,'sw')" (touchstart)="startResize($event,'sw')"></div>
+              <div class="ic-h ic-se" (mousedown)="startResize($event,'se')" (touchstart)="startResize($event,'se')"></div>
+              <div class="ic-h ic-n"  (mousedown)="startResize($event,'n')"  (touchstart)="startResize($event,'n')"></div>
+              <div class="ic-h ic-s"  (mousedown)="startResize($event,'s')"  (touchstart)="startResize($event,'s')"></div>
+              <div class="ic-h ic-e"  (mousedown)="startResize($event,'e')"  (touchstart)="startResize($event,'e')"></div>
+              <div class="ic-h ic-w"  (mousedown)="startResize($event,'w')"  (touchstart)="startResize($event,'w')"></div>
+            </div>
+          </div>
+
+          <div class="ic-footer">
+            <span class="ic-size">{{ cropSizeLabel }} px</span>
+            <div style="display:flex;gap:10px">
+              <button class="ic-btn-cancel" (click)="cancelAndClose()">Cancel</button>
+              <button class="ic-btn-crop" [style.background]="color" (click)="cropImage()">✂ Crop</button>
+            </div>
+          </div>
+
+        </div>
+      }
+
+    </div>
+  </div>
+}

@@ -1,0 +1,43 @@
+<div class="ms-wrap" [class.ms-vertical]="orientation === 'vertical'" [style.--ms-color]="color">
+
+  <!-- Step indicators -->
+  <div class="ms-track">
+    @for (step of steps; track $index; let last = $last) {
+      <div
+        class="ms-step"
+        [class.ms-active]="isActive($index)"
+        [class.ms-done]="isCompleted($index)"
+        [class.ms-clickable]="clickable && isReachable($index)"
+        (click)="goTo($index)">
+
+        <!-- Left connector -->
+        @if ($index > 0) {
+          <div class="ms-conn ms-conn-l" [class.ms-conn-done]="isCompleted($index - 1)"></div>
+        }
+
+        <!-- Circle -->
+        <div class="ms-circle">
+          @if (isCompleted($index)) {
+            <span>✓</span>
+          } @else if (step.icon) {
+            <span>{{ step.icon }}</span>
+          } @else {
+            <span>{{ $index + 1 }}</span>
+          }
+        </div>
+
+        <!-- Right connector -->
+        @if (!last) {
+          <div class="ms-conn ms-conn-r" [class.ms-conn-done]="isCompleted($index)"></div>
+        }
+
+        <!-- Labels (below circle in horizontal, right in vertical) -->
+        <div class="ms-labels">
+          <span class="ms-label">{{ step.label }}</span>
+          @if (step.description) { <span class="ms-desc">{{ step.description }}</span> }
+          @if (step.optional)    { <span class="ms-opt">Optional</span> }
+        </div>
+      </div>
+    }
+  </div>
+</div>

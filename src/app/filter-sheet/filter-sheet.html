@@ -1,0 +1,218 @@
+@if (service.visible()) {
+
+  <div class="fs-backdrop" (click)="close()"></div>
+
+  <div class="fs-sheet"
+    [style.transform]="dragOffsetY() ? 'translateY(' + dragOffsetY() + 'px)' : ''"
+    [style.transition]="dragOffsetY() ? 'none' : ''"
+    (touchstart)="onDragStart($event)"
+    (touchmove)="onDragMove($event)"
+    (touchend)="onDragEnd()">
+
+    <div class="fs-handle"></div>
+
+    <div class="fs-header">
+      <span class="fs-title">
+        Filters
+        @if (activeCount > 0) {
+          <span class="fs-active-badge">{{ activeCount }}</span>
+        }
+      </span>
+      <button class="fs-close" (click)="close()">✕</button>
+    </div>
+
+    <div class="fs-body">
+
+      <!-- LEFT: filter keys -->
+      <nav class="fs-nav">
+        @for (item of [
+          { key: 'sort',         label: 'Sort By' },
+          { key: 'price',        label: 'Price' },
+          { key: 'category',     label: 'Category' },
+          { key: 'brand',        label: 'Brand' },
+          { key: 'rating',       label: 'Rating' },
+          { key: 'discount',     label: 'Discount' },
+          { key: 'color',        label: 'Color' },
+          { key: 'size',         label: 'Size' },
+          { key: 'delivery',     label: 'Delivery' },
+          { key: 'availability', label: 'Availability' }
+        ]; track item.key) {
+          <button
+            class="fs-nav-item"
+            [class.active]="activeSection() === item.key"
+            (click)="activeSection.set(item.key)">
+            <span class="fs-nav-label">{{ item.label }}</span>
+            @if (sectionCount(item.key) > 0) {
+              <span class="fs-nav-dot"></span>
+            }
+          </button>
+        }
+      </nav>
+
+      <!-- RIGHT: filter values -->
+      <div class="fs-panel">
+
+        <!-- Sort By -->
+        @if (activeSection() === 'sort') {
+          <div class="fs-options">
+            @for (opt of sortOptions; track opt.value) {
+              <label class="fs-radio-item" (click)="sortBy.set(opt.value)">
+                <span class="fs-radio-circle" [class.checked]="sortBy() === opt.value"></span>
+                <span class="fs-radio-label">{{ opt.label }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Price -->
+        @if (activeSection() === 'price') {
+          <div class="fs-price-wrap">
+            <div class="fs-price-box">
+              <label>Min (₹)</label>
+              <input type="number" [ngModel]="priceMin()" (ngModelChange)="priceMin.set(+$event)" min="0" />
+            </div>
+            <div class="fs-price-sep">to</div>
+            <div class="fs-price-box">
+              <label>Max (₹)</label>
+              <input type="number" [ngModel]="priceMax()" (ngModelChange)="priceMax.set(+$event)" min="0" />
+            </div>
+          </div>
+        }
+
+        <!-- Category -->
+        @if (activeSection() === 'category') {
+          <div class="fs-options">
+            @for (cat of categories; track cat) {
+              <label class="fs-check-item">
+                <input type="checkbox"
+                  [checked]="selectedCategories().includes(cat)"
+                  (change)="toggleCategory(cat)" />
+                <span class="fs-check-box" [class.checked]="selectedCategories().includes(cat)">
+                  @if (selectedCategories().includes(cat)) { ✓ }
+                </span>
+                <span class="fs-check-label">{{ cat }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Brand -->
+        @if (activeSection() === 'brand') {
+          <div class="fs-options">
+            @for (brand of brands; track brand) {
+              <label class="fs-check-item">
+                <input type="checkbox"
+                  [checked]="selectedBrands().includes(brand)"
+                  (change)="toggleBrand(brand)" />
+                <span class="fs-check-box" [class.checked]="selectedBrands().includes(brand)">
+                  @if (selectedBrands().includes(brand)) { ✓ }
+                </span>
+                <span class="fs-check-label">{{ brand }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Rating -->
+        @if (activeSection() === 'rating') {
+          <div class="fs-options">
+            @for (star of stars; track star) {
+              <label class="fs-radio-item" (click)="setRating(star)">
+                <span class="fs-radio-circle" [class.checked]="minRating() === star"></span>
+                <span class="fs-star-row">
+                  @for (s of [1,2,3,4,5]; track s) {
+                    <span class="fs-star" [class.lit]="s <= star">★</span>
+                  }
+                  @if (star < 5) { <span class="fs-star-suffix">&amp; above</span> }
+                </span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Discount -->
+        @if (activeSection() === 'discount') {
+          <div class="fs-options">
+            <label class="fs-radio-item" (click)="discount.set('')">
+              <span class="fs-radio-circle" [class.checked]="!discount()"></span>
+              <span class="fs-radio-label">Any Discount</span>
+            </label>
+            @for (opt of discountOptions; track opt.value) {
+              <label class="fs-radio-item" (click)="discount.set(opt.value)">
+                <span class="fs-radio-circle" [class.checked]="discount() === opt.value"></span>
+                <span class="fs-radio-label">{{ opt.label }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Color -->
+        @if (activeSection() === 'color') {
+          <div class="fs-options">
+            @for (col of colors; track col.name) {
+              <label class="fs-check-item" (click)="toggleColor(col.name)">
+                <span class="fs-check-box" [class.checked]="selectedColors().includes(col.name)">
+                  @if (selectedColors().includes(col.name)) { ✓ }
+                </span>
+                <span class="fs-color-swatch" [style.background]="col.hex"></span>
+                <span class="fs-check-label">{{ col.name }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Size -->
+        @if (activeSection() === 'size') {
+          <div class="fs-size-grid">
+            @for (sz of sizes; track sz) {
+              <button
+                class="fs-size-btn"
+                [class.active]="selectedSizes().includes(sz)"
+                (click)="toggleSize(sz)">
+                {{ sz }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Delivery -->
+        @if (activeSection() === 'delivery') {
+          <div class="fs-options">
+            @for (opt of deliveryOptions; track opt.value) {
+              <label class="fs-check-item">
+                <input type="checkbox"
+                  [checked]="delivery().includes(opt.value)"
+                  (change)="toggleDelivery(opt.value)" />
+                <span class="fs-check-box" [class.checked]="delivery().includes(opt.value)">
+                  @if (delivery().includes(opt.value)) { ✓ }
+                </span>
+                <span class="fs-check-label">{{ opt.label }}</span>
+              </label>
+            }
+          </div>
+        }
+
+        <!-- Availability -->
+        @if (activeSection() === 'availability') {
+          <div class="fs-options">
+            @for (opt of availabilityOptions; track opt.value) {
+              <label class="fs-radio-item" (click)="availability.set(opt.value)">
+                <span class="fs-radio-circle" [class.checked]="availability() === opt.value"></span>
+                <span class="fs-radio-label">{{ opt.label }}</span>
+              </label>
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+
+    <div class="fs-footer">
+      <button class="fs-btn-reset" (click)="reset()">Reset</button>
+      <button class="fs-btn-apply" (click)="apply()">
+        Apply@if (activeCount > 0) { ({{ activeCount }})}
+      </button>
+    </div>
+
+  </div>
+}

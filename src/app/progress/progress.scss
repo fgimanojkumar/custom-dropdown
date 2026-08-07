@@ -1,0 +1,151 @@
+// ── Linear Wrapper ────────────────────────────────────────────────────────
+.pg-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+
+  &.pg-wrap-col {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
+}
+
+// ── Track ─────────────────────────────────────────────────────────────────
+.pg-track {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  transition: height 0.2s ease;
+}
+
+.pg-rounded { border-radius: 999px; }
+
+// Sizes
+.pg-xs  { height: 4px; }
+.pg-sm  { height: 6px; }
+.pg-md  { height: 10px; }
+.pg-lg  { height: 16px; }
+.pg-xl  { height: 24px; }
+
+// ── Buffer ────────────────────────────────────────────────────────────────
+.pg-buffer {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: inherit;
+  opacity: 0.45;
+}
+
+// ── Determinate Fill ──────────────────────────────────────────────────────
+.pg-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+
+  // Stripe overlay via pseudo-element (doesn't fight inline style)
+  &.pg-striped::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.22) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.22) 50%,
+      rgba(255, 255, 255, 0.22) 75%,
+      transparent 75%
+    );
+    background-size: 20px 20px;
+  }
+
+  &.pg-animated::after {
+    animation: pgStripes 0.7s linear infinite;
+  }
+}
+
+// ── Indeterminate ─────────────────────────────────────────────────────────
+.pg-indeterminate {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 40%;
+  border-radius: inherit;
+  animation: pgSlide 1.6s ease-in-out infinite;
+}
+
+// ── Label: inside fill ────────────────────────────────────────────────────
+.pg-label-inside {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #fff;
+  padding-right: 8px;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+// ── Label: right / bottom ─────────────────────────────────────────────────
+.pg-label-right {
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 38px;
+  text-align: right;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+// ── Circular Wrapper ──────────────────────────────────────────────────────
+.pg-circular-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// ── Circular fill (SVG circle) ────────────────────────────────────────────
+.pg-c-fill {
+  transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pg-c-indeterminate {
+  animation: pgCircleSpin 1.4s linear infinite;
+  transform-origin: center;
+}
+
+// ── Circular center label ─────────────────────────────────────────────────
+.pg-c-label {
+  position: absolute;
+  font-weight: 800;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  text-align: center;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+// ── Animations ────────────────────────────────────────────────────────────
+@keyframes pgStripes {
+  from { background-position: 0 0; }
+  to   { background-position: 20px 0; }
+}
+
+@keyframes pgSlide {
+  0%   { left: -45%; }
+  50%  { left: 20%; width: 60%; }
+  100% { left: 110%; }
+}
+
+@keyframes pgCircleSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

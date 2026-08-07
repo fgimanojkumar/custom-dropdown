@@ -149,6 +149,12 @@ $transition:  all .25s cubic-bezier(.4,0,.2,1);
   .track-off-label { right: 9px; }
 }
 
+// ── Long labels: dynamic track width via CSS vars ─────────────────────────
+.toggle.has-labels {
+  .track { width: var(--track-w); }
+  &.checked .thumb { transform: translateX(var(--thumb-tx)); }
+}
+
 // ── Thumb Spinner ─────────────────────────────────────────────────────────
 .thumb-spinner {
   width: 10px;

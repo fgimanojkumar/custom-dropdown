@@ -1,0 +1,51 @@
+<div class="fu-wrap">
+
+  <!-- Drop zone -->
+  <div
+    class="fu-zone"
+    [class.fu-dragging]="isDragging()"
+    [style.--fu-color]="color"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="onBrowse()">
+
+    <input #fileInput type="file"
+      [attr.accept]="accept"
+      [attr.multiple]="multiple ? '' : null"
+      style="display:none"
+      (change)="onFileInput($event)" />
+
+    <div class="fu-icon">
+      @if (isDragging()) { 📂 } @else { 📁 }
+    </div>
+    <div class="fu-label">{{ label }}</div>
+    <div class="fu-meta">Max {{ maxSizeMB }} MB &nbsp;·&nbsp; {{ accept }}</div>
+  </div>
+
+  <!-- File list -->
+  @if (files().length > 0) {
+    <div class="fu-list">
+      @for (f of files(); track f.id) {
+        <div class="fu-item" [class.fu-item-error]="f.error">
+          @if (f.preview) {
+            <img [src]="f.preview" class="fu-thumb" alt="" />
+          } @else {
+            <div class="fu-file-icon">{{ f.file.type.startsWith('image/') ? '🖼' : '📄' }}</div>
+          }
+          <div class="fu-info">
+            <div class="fu-name">{{ f.file.name }}</div>
+            <div class="fu-size">{{ formatSize(f.file.size) }}</div>
+            @if (f.error) { <div class="fu-err">{{ f.error }}</div> }
+          </div>
+          <button class="fu-remove" (click)="remove(f.id)">✕</button>
+        </div>
+      }
+    </div>
+
+    <div class="fu-footer">
+      <span>{{ validCount }} / {{ files().length }} file ready</span>
+      <button class="fu-clear" (click)="clear()">Clear all</button>
+    </div>
+  }
+</div>

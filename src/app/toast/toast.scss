@@ -1,0 +1,94 @@
+// ── Position containers ───────────────────────────────────────────────────
+.t-container {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+  width: calc(100vw - 32px);
+  pointer-events: none;
+
+  .t-item { pointer-events: all; }
+}
+
+.tc-top-right     { top: 20px; right: 20px; align-items: flex-end; }
+.tc-top-left      { top: 20px; left: 20px;  align-items: flex-start; }
+.tc-top-center    { top: 20px; left: 50%; transform: translateX(-50%); align-items: center; }
+.tc-bottom-right  { bottom: 20px; right: 20px;  align-items: flex-end;   flex-direction: column-reverse; }
+.tc-bottom-left   { bottom: 20px; left: 20px;   align-items: flex-start; flex-direction: column-reverse; }
+.tc-bottom-center { bottom: 20px; left: 50%; transform: translateX(-50%); align-items: center; flex-direction: column-reverse; }
+
+// ── Toast item ────────────────────────────────────────────────────────────
+.t-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 14px 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.13), 0 1px 4px rgba(0, 0, 0, 0.08);
+  animation: tIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  position: relative;
+  min-width: 260px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  &.t-success { border-left: 4px solid #22c55e; }
+  &.t-error   { border-left: 4px solid #ef4444; }
+  &.t-warning { border-left: 4px solid #f59e0b; }
+  &.t-info    { border-left: 4px solid #6366f1; }
+}
+
+// ── Icon ──────────────────────────────────────────────────────────────────
+.t-icon {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800;
+  flex-shrink: 0; margin-top: 1px;
+}
+
+.t-success .t-icon { background: #dcfce7; color: #15803d; }
+.t-error   .t-icon { background: #fee2e2; color: #dc2626; }
+.t-warning .t-icon { background: #fef3c7; color: #d97706; }
+.t-info    .t-icon { background: #e0e7ff; color: #4f46e5; }
+
+// ── Body ──────────────────────────────────────────────────────────────────
+.t-body  { flex: 1; min-width: 0; }
+.t-title { font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+.t-msg   { font-size: 0.8rem; color: #475569; line-height: 1.45; }
+
+// ── Close ─────────────────────────────────────────────────────────────────
+.t-close {
+  border: none; background: none; cursor: pointer;
+  color: #94a3b8; font-size: 13px; padding: 2px;
+  flex-shrink: 0; transition: color 0.15s; line-height: 1;
+  &:hover { color: #1e293b; }
+}
+
+// ── Progress bar ──────────────────────────────────────────────────────────
+.t-progress {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  animation: tProgress linear forwards;
+  opacity: 0.5;
+}
+
+.t-success .t-progress { background: #22c55e; }
+.t-error   .t-progress { background: #ef4444; }
+.t-warning .t-progress { background: #f59e0b; }
+.t-info    .t-progress { background: #6366f1; }
+
+// ── Animations ────────────────────────────────────────────────────────────
+@keyframes tIn {
+  from { transform: translateX(100%) scale(0.9); opacity: 0; }
+  to   { transform: translateX(0)    scale(1);   opacity: 1; }
+}
+
+@keyframes tProgress {
+  from { width: 100%; }
+  to   { width: 0%;   }
+}

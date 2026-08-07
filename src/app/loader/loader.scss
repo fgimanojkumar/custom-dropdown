@@ -37,7 +37,7 @@
   animation: popup 0.25s ease;
   transition: transform .2s ease;
 
-  &:hover { transform: translateY(-2px); }
+  // &:hover { transform: translateY(-2px); }
 }
 
 // ── Dots ──────────────────────────────────────────────────────────────────
@@ -147,6 +147,15 @@
   animation: ringAnim 0.9s cubic-bezier(.4,0,.6,1) infinite;
   box-shadow: 0 0 16px rgba(0,0,0,.08);
 }
+.loader-image {
+  display: block;
+  max-width: 100px;
+  max-height: 100px;
+  margin: 0 auto 14px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
 .loader-title {
   margin-bottom: 6px;
   font-size: 1rem;
@@ -315,9 +324,9 @@
   text-overflow: ellipsis;
 }
 
-.loader-card:hover {
-  transform: translateY(-2px);
-}
+// .loader-card:hover {
+//   transform: translateY(-2px);
+// }
 
 @keyframes bounce {
   0%,

@@ -1,0 +1,107 @@
+<!-- ══ LINEAR ══════════════════════════════════════════════════════════════ -->
+@if (type === 'linear') {
+  <div class="pg-wrap" [class.pg-wrap-col]="showLabel && labelPosition === 'bottom'">
+
+    <div
+      class="pg-track"
+      [class.pg-rounded]="rounded"
+      [class.pg-xs]="size === 'xs'"
+      [class.pg-sm]="size === 'sm'"
+      [class.pg-md]="size === 'md'"
+      [class.pg-lg]="size === 'lg'"
+      [class.pg-xl]="size === 'xl'"
+      [style.background]="trackColor">
+
+      <!-- Buffer layer -->
+      @if (mode === 'buffer') {
+        <div class="pg-buffer" [style.width.%]="buf" [style.background]="bufferColor"></div>
+      }
+
+      <!-- Indeterminate -->
+      @if (mode === 'indeterminate') {
+        <div class="pg-indeterminate" [style.background]="fillBackground"></div>
+      }
+
+      <!-- Determinate fill -->
+      @if (mode !== 'indeterminate') {
+        <div
+          class="pg-fill"
+          [class.pg-striped]="striped"
+          [class.pg-animated]="animated && striped"
+          [class.pg-rounded]="rounded"
+          [style.width.%]="val"
+          [style.background]="fillBackground">
+          @if (showLabel && labelPosition === 'inside' && val > 12) {
+            <span class="pg-label-inside">{{ displayLabel }}</span>
+          }
+        </div>
+      }
+    </div>
+
+    @if (showLabel && labelPosition === 'right') {
+      <span class="pg-label-right" [style.color]="color">{{ displayLabel }}</span>
+    }
+
+    @if (showLabel && labelPosition === 'bottom') {
+      <span class="pg-label-right" [style.color]="color">{{ displayLabel }}</span>
+    }
+  </div>
+}
+
+<!-- ══ CIRCULAR ════════════════════════════════════════════════════════════ -->
+@if (type === 'circular') {
+  <div class="pg-circular-wrap" [style.width.px]="diameter" [style.height.px]="diameter">
+
+    <svg
+      [attr.width]="diameter"
+      [attr.height]="diameter"
+      [attr.viewBox]="'0 0 ' + diameter + ' ' + diameter"
+      style="transform:rotate(-90deg)">
+
+      <!-- Gradient def -->
+      @if (color2) {
+        <defs>
+          <linearGradient id="pg-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   [attr.stop-color]="color" />
+            <stop offset="100%" [attr.stop-color]="color2" />
+          </linearGradient>
+        </defs>
+      }
+
+      <!-- Track circle -->
+      <circle
+        [attr.cx]="cx" [attr.cy]="cx" [attr.r]="radius"
+        fill="none"
+        [attr.stroke]="trackColor"
+        [attr.stroke-width]="thickness" />
+
+      <!-- Progress circle -->
+      @if (mode !== 'indeterminate') {
+        <circle
+          class="pg-c-fill"
+          [attr.cx]="cx" [attr.cy]="cx" [attr.r]="radius"
+          fill="none"
+          [attr.stroke]="color2 ? 'url(#pg-grad)' : color"
+          [attr.stroke-width]="thickness"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="circumference"
+          [attr.stroke-dashoffset]="strokeDashoffset" />
+      } @else {
+        <circle
+          class="pg-c-indeterminate"
+          [attr.cx]="cx" [attr.cy]="cx" [attr.r]="radius"
+          fill="none"
+          [attr.stroke]="color"
+          [attr.stroke-width]="thickness"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="circumference * 0.25 + ' ' + circumference * 0.75" />
+      }
+    </svg>
+
+    @if (showLabel) {
+      <div class="pg-c-label" [style.font-size.px]="diameter * 0.17" [style.color]="color">
+        {{ mode === 'indeterminate' ? '…' : displayLabel }}
+      </div>
+    }
+  </div>
+}

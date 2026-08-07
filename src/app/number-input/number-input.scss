@@ -1,0 +1,95 @@
+.ni-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  &.ni-disabled { opacity: 0.5; pointer-events: none; }
+}
+
+.ni-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.ni-control {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus-within {
+    border-color: var(--ni-color, #6366f1);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ni-color, #6366f1) 12%, transparent);
+  }
+}
+
+.ni-btn {
+  border: none;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #64748b;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background: var(--ni-color, #6366f1);
+    color: #fff;
+  }
+
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.ni-input {
+  border: none;
+  outline: none;
+  text-align: center;
+  font-weight: 700;
+  color: #0f172a;
+  background: #fff;
+  font-family: inherit;
+
+  // Hide number input arrows
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; }
+  &[type='number'] { -moz-appearance: textfield; }
+}
+
+.ni-affix {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+}
+
+// Sizes
+.ni-sm {
+  .ni-btn   { width: 32px; height: 32px; font-size: 1rem; }
+  .ni-input { width: 56px; font-size: 0.88rem; }
+  .ni-affix { padding: 0 6px; font-size: 0.74rem; }
+}
+
+.ni-md {
+  .ni-btn   { width: 38px; height: 42px; }
+  .ni-input { width: 70px; font-size: 1rem; }
+  .ni-affix { padding: 0 8px; }
+}
+
+.ni-lg {
+  .ni-btn   { width: 46px; height: 52px; font-size: 1.2rem; }
+  .ni-input { width: 88px; font-size: 1.1rem; }
+  .ni-affix { padding: 0 10px; font-size: 0.88rem; }
+}

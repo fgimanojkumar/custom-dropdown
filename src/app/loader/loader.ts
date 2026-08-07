@@ -1,5 +1,6 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, inject, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LoaderService } from './loader.service';
 
 @Component({
   selector: 'app-loader',
@@ -10,31 +11,25 @@ import { CommonModule } from '@angular/common';
 })
 export class Loader {
 
-  /** Show/hide loader — ts file se true/false karo */
-  @Input() set visible(v: boolean) { this.visibleSignal.set(!!v); }
+  readonly loaderService = inject(LoaderService);
 
-  @Input() title = 'Loading...';
-  @Input() message = 'Please wait while we process your request';
+  // Computed helpers so template stays simple
+  get visibleSignal() { return this.loaderService.visible; }
+  get cfg() { return this.loaderService.config(); }
 
-  /** Spinner color */
-  @Input() color = '#6366f1';
+  get title()       { return this.cfg.title       ?? 'Loading...'; }
+  get message()     { return this.cfg.message     ?? 'Please wait while we process your request'; }
+  get color()       { return this.cfg.color       ?? '#6366f1'; }
+  get backdrop()    { return this.cfg.backdrop     ?? 'blur'; }
+  get type()        { return this.cfg.type         ?? 'dots'; }
+  get showTitle()   { return this.cfg.showTitle    ?? true; }
+  get showMessage() { return this.cfg.showMessage  ?? true; }
+  get fullscreen()  { return this.cfg.fullscreen   ?? true; }
+  get image()                { return this.cfg.image                ?? ''; }
+  get showImage()             { return this.cfg.showImage            ?? false; }
+  get closeOnBackdropClick()  { return this.cfg.closeOnBackdropClick ?? false; }
 
-  /** Backdrop color: 'light' | 'dark' | 'blur' | 'transparent' */
-  @Input() backdrop: 'light' | 'dark' | 'blur' | 'transparent' = 'blur';
-
-  /** Spinner style: 'dots' | 'spinner' | 'bar' | 'pulse' | 'wave' | 'ring' */
-  @Input() type: 'dots' | 'spinner' | 'bar' | 'pulse' | 'wave' | 'ring' = 'dots';
-
-  /** Show/hide title */
-  @Input() showTitle = true;
-
-  /** Show/hide message */
-  @Input() showMessage = true;
-
-  /** Full screen overlay ya inline block */
-  @Input() fullscreen = true;
-
-  visibleSignal = signal(true);
-
-  get visible(): boolean { return this.visibleSignal(); }
+  onBackdropClick(): void {
+    if (this.closeOnBackdropClick) this.loaderService.hide();
+  }
 }
